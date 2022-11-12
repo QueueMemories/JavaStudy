@@ -17,7 +17,5 @@
     OpenTheDoor  &nbsp-> sangwool <br>
   </details>
   <br>
-  <h5>Manager<h5>
-  <hr />
-  JiYong Kim
+  <h5>Manager</h5> : JiYong Kim
 </blockquote>
