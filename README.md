@@ -11,10 +11,10 @@
     <summary>
       branch
     </summary>
-    main branch \t-> main, <br>
-    BlueTree-Na \t-> Blue, <br>
-    Hamul777    \t\t-> won, <br>
-    OpenTheDoor \t-> sangwool <br>
+    main branch '\t'-> main, <br>
+    BlueTree-Na '\t'-> Blue, <br>
+    Hamul777    '\t\t'-> won, <br>
+    OpenTheDoor '\t'-> sangwool <br>
   </details>
   <br>
   manager -> JiYong Kim
