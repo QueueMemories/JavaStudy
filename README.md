@@ -19,6 +19,5 @@
   <br>
   <h5>Manager<h5>
   <hr />
-  <br>
-  - JiYong Kim
+  JiYong Kim
 </blockquote>
