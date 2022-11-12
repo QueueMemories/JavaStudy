@@ -1,2 +1,0 @@
-# JavaStudy
-Together Happy Java
