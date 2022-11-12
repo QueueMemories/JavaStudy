@@ -1,7 +1,6 @@
 ## JavaStudy
-Together Happy Java
 <blockquote>
-  <h3>주 branch 는 main, 각 개인은 각자 branch 생성후 관리.</h3><br><br>
+  <h3>주 branch 는 main, 각 개인은 각자 branch 생성후 관리.</h3>
   규칙 1. 서로의 branch 관여 x.<br>
   규칙 2. 서로의 file 관여 x.<br>
   규칙 3. 소규모로 commit 후, 1주일에 한번 push.<br>
