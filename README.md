@@ -11,9 +11,9 @@
     <summary>
       branch
     </summary>
-    main branch &nbsp -> main, <br>
-    BlueTree-Na &nbsp -> Blue, <br>
-    Hamul777 &nbsp &nbsp &nbsp -> won, <br>
+    main branch &nbsp &nbsp -> main, <br>
+    BlueTree-Na &nbsp &nbsp -> Blue, <br>
+    Hamul777 &nbsp &nbsp &nbsp &nbsp -> won, <br>
     OpenTheDoor &nbsp -> sangwool <br>
   </details>
   <br>
