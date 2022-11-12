@@ -18,6 +18,7 @@
   </details>
   <br>
   <h5>Manager<h5>
-  ---
+  --- 
+  <br>
   - JiYong Kim
 </blockquote>
