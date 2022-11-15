@@ -562,3 +562,165 @@
     BigInteger r = BigInteger.valueOf(5).multiply(n.add(k));
     // r = 5 * (n + k)
     ```
+    <br><br>
+
+    <h2>1.5 문자열</h2>
+
+    ---
+    <blockquote>
+    문자열은 문자의 연속이다. 자바에서는 유니코드 문자라면 무엇이든 문자열에 쓸 수 있다.
+    </blockquote><br>
+    <h3>1.5.1 문자열 연결</h3>
+    
+    ---
+
+    문자열은  +로 연결할 수 있다. 
+
+    ```java
+    String args = "Hello" + " Java";
+    // Hello Java
+    int age = 24;
+    String output = age + args;
+    // 24Hello Java 
+
+    // 자동으로 문자열로 변환되어 병합되기 때문에, 조심해야 한다.
+    "My age is " + age + 1;
+    // My age is 241
+    "My age is " + (age + 1);
+    // My age is 25
+
+    String names = String.join(", ", "Peter", "Paul", "Mary");
+    // names를 "Peter, Paul, Mary" 로 설정.
+    // 첫 번째 인자로 구분자를 설정할 수 있다.
+
+    // StringBuilder
+    StringBuilder sb = new StringBuilder();
+    sb.append("문상우 ").append("김우원 ").append("나청송 ");
+    String result = sb.toString();
+    // 여러 합쳐질 문자열을 하나로 관리 후, toString 함수를 통해 String 타입으로 처리.
+    ```
+    <br>
+    <h3>1.5.2 부분 문자열</h3>
+
+    ---
+
+    ```java
+    // substring()
+
+    String location = "Hello, World!".substring(7, 12);
+    // World
+    // 첫번째 인자 -> 추출할 부분 문자열의 시작 위치
+    // 두번째 인자 -> 추출하지 않을 부분의 시작 위치
+    // 첫번째 인자부터 두번째 인자를 포함하지 않는 부분까지 추출한다.
+
+    // split()
+
+    String names = "문상우, 김우원, 나청송";
+    String[] result = names.split(", ");
+    // 문자열 세 개로 구성된 배열 ["Peter", "Paul", "Mary"]
+    // split 안에 들어가는 분리자(seperator)로 어떤 정규 표현식이든 사용할 수 있다.
+    ```
+    <br>
+    <h3>1.5.3 문자열 비교</h3>
+    
+    ---
+
+    ```java
+    // equals()
+
+    location.equals("world");
+    // location의 리터럴 값이 "world" 라면 true
+
+    location.equals("world");
+    // location의 리터럴 값이 대소문자가 섞인 world라면 true를 반환한다.
+
+    "first".compareTo("second");
+    // 오름차순으로 한 문자열이 또 다른 문자열보다 앞에 오는지를 알려준다.
+    // 앞에 온다면 음의 정수를 반환
+    // 뒤에 온다면 양의 정수를 반환
+    // 같다면 0을 반환한다.
+
+    // 문자열 어떤 객체도 가능(null도 가능)
+    String middleName = null;
+    // null 검사 (equals도 가능)
+    if (middleName == null) {
+        System.out.println(middleName + "은 null입니다.");
+    }
+    // null은 null입니다. 
+    ```
+
+    <h3>== 이 아니라 .equals()를 쓰는 이유.</h3> 
+    <blockquote>
+    문자열은 객체이다. 따라서 각  객체에 해당 리터럴 값이 저장되는데, ==으로 비교하게 되면 이 객체 참조를 조사한다. 따라서 리터럴 값이 같아도 객체가 다르면 false가 나오게 된다. 하지만 equals를 쓰게 되면 다른 객체이더라도 리터럴 값만 같다면 true를 출력해주기에 단순 값 비교를 위해서는 .equals()를 써야 한다. 
+    </blockquote><br><br>
+    <h3>1.5.4 숫자와 문자열 사이의 변환</h3>
+
+    ---
+
+    Integer.toString
+
+    정수를 문자열로 변환할때 호출됨.
+
+    ```java
+    int n = 42;
+    String str = Integer.toString(n); // str을 "42"로 설정
+    String str2 = Integer.toString(n, 2); // str을 "101010"로 설정
+
+    int n = Integer.parse(str2); // n을 101010으로 설정함. (2진수 보이는 모습 그대로 변환해버림)
+    int n2 = Integer.parse(str2, 2); // n을 42으로 설정함. (2진수에 해당하는 수로 변환)
+
+    // 부동소수점
+    String str = Double.toString(3.14); // str을 "3.14"로 설정한다.
+    double x = Double.parseDouble(str); // x를 3.14로 설정한다.
+    ```
+
+    1.5.5 문자열 API
+
+    String class의 메서드들이다.
+
+    <image src="https://t1.daumcdn.net/cfile/tistory/232F4E4955F77F890B">
+    <blockquote>
+    자바에서 String 클래스는 불변(immutable)이다. 해당 문자열 자체를 변경할 수는 없고 새로운 문자열을 반환하는 것이다.
+
+    또, 일부 메서드는 CharSequence 타입 매개변수를 받는다. CharSequence 는 String, StringBuilder, 다른 문자 시퀀스의 공통 슈퍼타입(supertype)이다.
+    </blockquote><br>
+
+    <h3>1.5.6 코드  포인트와 코드 유닛</h3>
+    
+    ---
+    <blockquote>
+    자바는 유니코드 표준을 사용해 왔고, 표준화를 시키려 노력했다. 하지만 여러 국가들의 언어를 포함시킴으로써 필요로하는 비트 수가 많아졌고 이에 서로 다른 인코딩으로 된 파일을 교환하는 문제점이 발생했다.
+
+    처음부터 16비트 코드를 할당하는 방법으로 이 문제를 해결하기 시작했지만, 문자가 예상보다 훨씬 많다는 문제점이 발생한다. 이에 현재 유니코드는 21비트를 요구하고, 유효한 유니 코드 값을 코드 포인트(code point)라고 한다. 
+
+    ex) A 문자의 코드 포인트는 U+0041
+
+    UTF-16은 길이가 가변적이고 하위 호환성을 지원하는 인코딩이다. 이 인코딩은 모든 유니코드 문자를 16비트 값 한 개로 나타내고, U+FFFF를 넘는 문자는 “대용 문자”라는 코드 공간의 특별한 영역에서 가져온 16비트 값의 쌍으로 나타낸다. 
+
+    자바 문자열은 유니코드 문자(코드 포인트)의 원래 시퀀스가 아닌 UTF-16으로 인코딩된 16비트 숫자인 코드 유닛의 시퀀스다.
+
+    특수 문자 또는 중국어 표의 문자를 버릴 것이라면 다음처럼 코딩한다.
+
+    ```java
+    char ch = str.charAt(i);
+    int length = str.length();
+    ```
+
+    하지만, 문자열을 제대로 처리하려면 더 많은 작업이 필요하다. i번째 유니코드의 코드 포인트를 얻기 위해서는 다음과 같이 호출한다.
+
+    ```java
+    int codePoint = str.codePointAt(str.offsetByCodePoints(0, i));
+
+    // 코드 포인트의 총수
+    int length = str.codePointCount(0, str.length());
+
+    // 이 루프는 코드 포인트를 순차적으로 추춘한다.
+    int i = 0;
+    while (i < s.length) {
+        int j = s.offsetByCodePoints(i, 1);
+        String codePoint = str.substring(i, j);
+        // 내용 생략
+        i = ;
+    }
+    ```
+    </blockquote>
