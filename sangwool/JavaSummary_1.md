@@ -799,5 +799,234 @@
     String message = String.format("Hello, %s. your age is %d", "moon", 24);
     ```
         
+    <h2>1.7 제어 흐름</h2>
 
+    ---
+
+    <h3>1.7.1 분기</h3>
+
+    ---
+
+    if 문 (if - else if - else 가 각각 하나의 분기)
+
+    ```java
+    if (count > 0) {
+        double average = sum / count;
+    } else if (count == 0) {
+        System.out.println(0);
+    } else {
+        System.out.println("Huh?");
+    }
+    ```
+
+    switch 문 (제한된 상수값을 기준으로 표현식을 검사할 때 사용)
+
+    ```java
+    switch (count) {
+        case 0:
+            output = "None";
+            break;
+        case 1:
+            output = "one";
+            break;
+        case 2:
+        case 3:
+        case 4:
+        default:
+            output = "Many";
+            break;
+    }
+    // 일치하는 case 레이블 실행, 일치하는 레이블이 없다면 default 레이블 실행.
+    // break를 빠뜨리면 다음 문장을 실행하기 때문에, 반드시 break를 써줘야 함.
+    ```
+    <blockquote>
+    case 레이블은 정수 뿐만 아니라 char, byte, short, int 타입(이들의 래퍼런스 클래스인 Character, Byte, Short, Integer) 상수표현식, 문자열 리터럴, 열거 값을 넣을 수 있다.
+    </blockquote><br><br>
+
+    <h3>1.7.2 루프</h3>
+
+    ---
+
+    while 루프는 조건 검사 결과에 따라 수행할 작업이 남아 있는 동안 바디를 계속 실행한다. 
+    <br>for 루프는 반복 횟수가 고정되어 있을 때 사용한다.
+
+    ```java
+    // while
+    Random rand = new Random();
+    while (sum < target) {
+        int next = rand.nextInt(10);  // 0~9 사이의 임의의 정수
+        sum += next;
+        count++;
+    }
+    // 위는 합계(sum)가 목표 값 이상이 될 때까지 루프를 진행한다.
+
+    // 조건을 평가하기 전에 루프를 먼저 실행해야 할때는 아래 문법을 사용한다.
+    do {
+        next = rand.nextInt(10);
+        count++;
+    } while (next != target);
+    // 문장을 한번 들어가 next와 count에 대한 연산을 끝내고 처음으로 조건을 평가한다.
+
+    // for
+    for (int i = 1; i <= 20; i++) {
+        int next = rand.nextInt(10);
+        sum += next;
+    }
+    // 위는 i를 20번 반복하고 0~9의 임의의 수를 sum에 더한다.
+    int i = 1;
+    while (i <= 20) {
+        int next = rand.nextInt(10);
+        sum += next;
+        i++;
+    }
+    // 위는 위에 있는 for문을 while문으로 바꾼 것이다.
+    // 이렇게 되면 i 변수의 초기화, 검사, 업데이트가 각기 다른 위치에서 하게 되므로 for문을 사용해야 한다.
+
+    // for 루프의 헤더(선언부)에서 변수를 선언하는 대신 기존 변수를 초기화해도 된다.
+    for (i = 1; i <= target; i++) // 기존 i변수 사용.
+
+    // 콤마를 사용해 여러 변수를 선언하거나 초기화하고 업데이트 할 수 있다.
+    for (int i = 0, j = n-1; i < j; i++, j--) 
+
+    // 초기화나 업데이트가 필요 없다면 비워둘 수 있다. 조건을 생략하면 항상 true로 간주된다.
+    for (;;) // 무한 루프 
+    ```
+    <br>
+
+    <h3>1.7.3 중단과 계속</h3>
+
+    ---
+    <br>
+    break
+
+    ```java
+    boolean done = false;
+    String input;
+    while (!done) {
+        input = sc.next();
+        if ("Q".equals(input)) {
+            done = true;
+        } else {
+            System.out.println("Q를 입력하면 종료.");
+        }
+    }
+    // 위는 boolean 변수로 루프를 제어해서 중간에 루프를 빠져나오는 방법이다.
+
+    String input;
+    while (true) {
+        input = sc.next();
+        if ("Q".equals(input)) break;         // 루프 종료
+        System.out.println("Q를 입력하면 종료.");
+    }
+    // break시에 이곳으로 넘어옴.
+    // 위는 break를 사용하는 방법이다.
+    ```
+    <br>
+    continue
+
+    ```java
+    while (sc.hasNextInt()) {
+        int input = sc.nextInt();
+        if (n < 0) continue;     
+        // 검사 부분 즉 sc.hasNextInt()으로 건너뛰고 밑의 코드는 실행하지 않는다.
+    }
+
+    // for 루프 안에서 사용하면 continue 문은 그 다음 업데이트 문장으로 건너뛰게 한다.
+    for (int i = 1; i <= target; i++) {
+        int input = sc.nextInt();
+        if (n < 0) continue; // i++로 건너뛰고 밑의 코드는 실행하지 않는다.
+    }
+    ```
+    <br>
+
+    <h3>Labeled Break</h3>
+
+    break 문은 자신을 감싼 루트 한개만 빠져나온다. 따라서 중복 반복문을 탈출하기 위해서는 레이블을 붙인 break 문을 사용해야 한다.
+
+    ```java
+    sangwoo:
+    while (...) {
+        while (...) {
+            while (...) {
+                if (...) break sangwoo;
+            }
+        }
+    }
+    // 레이블이 붙어 있는 while문을 탈출한다.
+    // 레이블은 문장의 위쪽에 붙이지만, break 문은 해당 문장의 끝으로 건너뛴다.
+
+    // 이 레이블을 붙인 break는 블록 문을 포함해서 어떤 문장의 끝으로든 제어를 이동할 수 있다.
+    sangwoo: {
+        if (...) break sangwoo;
+    }
+    // 레이블을 붙인 break는 이 위치로 건너뛴다.
+
+    // continue도 동일 coutinue는 해당 루프의 다음 조건문, 다음 업데이트 문장으로 이동한다.
+    ```
+    <br><br>
+
+    <h3>1.7.4 지역 변수의 유효 범위</h3>
+
+    ---
+    <blockquote>
+
+    스코프(scope)
+    <blockquote>
+    스코프란, 변수의 유효 범위로써, 프로그램에서 해당 변수에 접근할 수 있는 범위이다.
+    </blockquote>
+    <br>
+
+    지역 변수(local variable)
+    <blockquote>
+    지역 변수는 메서드의 매개변수를 포함해 메서드 안에 선언한 변수이다. 지역 변수의 스코프는 변수 선언 지점에서 시작해 해당 선언을 감싼 블록의 끝까지 이어진다. 매개 변수의 유효 범위는 메서드 전체이다.
+    </blockquote>
+    <br>
+    </blockquote>
+    <br>
+
+    ```java
+    {
+        int age = 24;
+        ...
+        // 여기서 age의 스코프는 끝.
+    }
+    ```
+    <br><br>
+
+    루프가 반복될 때마다, 변수의 사본을 새로 만들고 루프 바깥쪽에는 이 변수가 존재하지 않는다.
+    
+
+    ```java
+    int next;
+    do {
+        next = rand.nextInt(10);
+        count++;
+    } while (next != target);
+    // 만일 위에서 next를 루프 안쪽에서 선언했다면, next의 유효 범위가 루프 바디의 끝까지만 이어졌을 것이다.
+
+    // for 루프에서 변수를 선언하면 해당 변수의 스코프는 검사와 업데이트 부분을 포함해 루프의 끝까지 이어진다.
+    for (int i = 0; i < n; i++) { // i가 검사 및 업데이트의 유효 범위 안에 있다.
+        ...
+    }
+    // 이곳은 i가 정의되어 있지 않은 곳.
+
+    // 루프가 끝난 후에도 i를 사용하고 싶다면 i를 변수 밖에서 선언해야 한다.
+    int i = 0;
+    for (int i = 0; i < n; i++) {
+        ...
+    }
+    // 이곳에서도 i를 사용할 수 있다.
+
+    // 따라서 java에서는 서로 겹치는 유효 범위에 이름이 같은 지역 변수를 여러개 둘 수 없고, 
+    // 유효 범위가 겹치지 않는다면 변수 이름이 같아도 재사용할 수 있다.
+
+    int i = 0;
+    while (...) {
+            String i = sc.next(); // 또 다른 변수를 선언하는 것은 오류.
+        ...
+    }
+
+    for (int i = 0; i < n; i++) { ... }
+    for (int i = n/2; i < n; i++) { ... } // i를 재정의해도 상관없다.
+    ```
 
