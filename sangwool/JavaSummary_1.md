@@ -723,4 +723,81 @@
         i = ;
     }
     ```
-    </blockquote>
+    </blockquote><br><br>
+
+    <h2>1.6 입력과 출력</h2>
+
+    ---
+
+    <h3>1.6.1 입력 읽어 오기</h3>
+
+    ---
+
+    출력은 System.out.println을 호출하면 ‘표준 출력 스트림(standard output stream)’으로 전달되어 터미널에 표시된다. 하지만 입력은 [System.in](http://System.in) 객체에는 바이트 한 개를 읽어 오는 메소드만 존재하기에 ‘표준 입력 스트림(standard input stream)’에서 읽기는 쉽지 않다 따라서 System.in에 연결된 Scanner를 생성한다. 
+
+    ```java
+    // Scanner 클래스는 java.util 패키지에 있으므로 import를 해서 불러와야한다.
+    import java.util.Scanner;
+
+    Scanner sc = new Scanner(System.in);
+    // Scanner 선언
+
+    //nextLine 메서드는 입력을 한 줄 읽는다.
+    String name = sc.nextLine();
+    // 위는 입력이 공백을 포함할 수 있다.
+    String firstName = sc.next();
+    // 위는 공백으로 구분된 단어 한 개를 읽는다.
+    int age = sc.nextInt();
+    // 정수를 읽기 위해선 nextInt를 사용한다.
+    // nextDouble 메서드는 다음 번 부동소수점 수를 읽는다.
+    double height = sc.nextDouble();
+    // 다른 줄, 단어, 정수, 부동소수점 수가 있는지 검사하고 싶을 때는
+    // hasNextLine, hasNext, hasNextInt, hasNextDouble 메서드를 사용한다.
+    ```
+    <br>
+    <h3>비밀번호를 받을 때, 사용하는 Console 클래스</h3>
+
+    ```java
+    Console terminal = System.console();
+    String username = terminal.readLine("User name: ");
+    char[] passwd = terminal.readPassword("Password: ");
+    // readPassword로 입력을 읽으면 비밀번호가 문자 배열로 반환된다.
+    // 문자 배열을 비밀번호를 사용한 후, 덮어쓸 수 있어 String 보다 조금 더 안전하다.
+    ```
+    <br>
+    <h3>1.6.2 포맷 적용 출력</h3>
+
+    ---
+
+    ```java
+    System.out.print("_");    // 출력 후 다음 줄이 아닌 바로 뒤에 커서가 존재.
+    System.out.println("_");  // 출력 후 다음 줄에 커서 존재.
+    // 위 두 명령어는 소수점을 있는 그대로 모두 출력한다.
+
+    // 출력되는 숫자의 개수를 제한하려면 printf 메서드를 사용한다.
+
+    System.out.printf("%8.2f", 1000.0 / 3.0);
+    // 333.33
+    // 포멧 문자열(format string) "%8.2f"는 부동소수점 수를 필드 폭(field width)은 8자리로 출력,
+    // 정밀도(precision)는 2자리로 출력한다.
+    // 이는 소수점을 2개까지 표현하고, 전체 문자 수를 8개 출력한다는 뜻이다(위 코드는 앞에 공백 두개 포함).
+    // printf 에 매개변수를 여러 개 지정할 수 있다.
+    ```
+
+    포맷 지정자
+
+    포맷 지정자는 각각에 대응하는 인수로 교체된다. 포맷 지정자 끝에 오는 변환 문자(conversion character)는 포맷이 적용될 값의 타입을 나타낸다.
+
+    <image src="https://t1.daumcdn.net/cfile/tistory/9973C5405BE279162F">
+
+    ```java
+    System.out.printf("%,+.2f", 100000.0 / 3.0);
+    // +33,333.33
+    // , 는 그룹 분리자를 추가하고 +는 숫자에 부호를 붙인다.
+
+    // String.format 메서드를 사용하면 포맷 적용 문자열을 출력하지 않고 만들 수 있다.
+    String message = String.format("Hello, %s. your age is %d", "moon", 24);
+    ```
+        
+
+
