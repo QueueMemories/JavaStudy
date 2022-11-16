@@ -1037,3 +1037,257 @@
     for (int i = 0; i < n; i++) { ... }
     for (int i = n/2; i < n; i++) { ... } // i를 재정의해도 상관없다.
     ```
+
+    <br><br>
+    <h2>1.8 배열과 배열 리스트</h2>
+
+    ---
+
+    <h3>1.8.1 배열 다루기</h3>
+    
+    ---
+
+    모든 타입에는 대응하는 배열 타입이 존재한다. 정수 → int[], 문자열 → String[] 등.
+
+    ```java
+    // 배열 선언 및 사용
+    String[] name; // String name[] 도 가능하지만 거의 사용하지 않음.
+    name = new String[100];
+    // ==
+    String name = new String[100];
+
+    // name은 100개의 String타입으로 된 요소를 가지고 인덱스의 범위는 0~99이다.
+    // 만일 인덱스 -1또는 100에 접근하게 된다면, ArrayIndexOutOfBoundsException 오류가 발생한다.
+
+    name.length // 배열의 길이를 알 수 있다 (array.length)
+    ```
+    <br>
+    <h3>1.8.2 배열 생성</h3>
+
+    ---
+
+    new 연산자로 배열을 생성할때, 기본적으로
+
+    - 숫자 타입(char포함)의 배열은 0으로 채운다.
+    - boolean의 배열은 false로 채운다.
+    - 객체의 배열은 null 참조로 채운다.
+    
+    <br>
+    객체의 배열을 생성한 후에는 객체로 채워야 한다(아무것도 초기화 된 것이 없고 null을 참조할 뿐이기 때문에)
+
+    ```java
+    BigInteger[] numbers = new BigInteger[100];
+
+    for (int i = 0; i < 100; i++) 
+    numbers[i] = BigInteger.valueOf(i)
+    // 해당 인덱스에 해당하는 요소에 인덱스 값을 넣어주는 코드이다(초기화).
+
+    // 반복문 없이 배열을 초기화 하는 법.
+    int[] primes = { 2, 3, 4, 5, 6, 10, 12, };
+    // 이 때는, new 연산자를 사용하지 않고, 배열의 길이도 지정하지 않는다. 
+    // 마지막 요소 뒤에는 쉼표를 넣어도 무관하다. 배열에 값을 추가해 나갈 때 편리하다.
+
+    // 기존에 존재하는 배열에 새 배열을 할당하는 법.
+    primes = new int[] { 17, 19, 23, 29, 31 };
+    ```
+    <blockquote>
+    Note. 길이가 0인 배열을 만들 수 있다. 생성은 new int[0], new int[] {} 로 생성. 일치하는 항복의 배열을 반환하는 메서드는 특정 입력과 일치하는 항목이 없을 때, 길이가 0인 배열을 반환한다. 이를 이용하는 방법은 a가 길이가 0인 배열이라면, a.length == 0으로 검사를 할 수 있지만, a가 null이라면 a.length는 NullPointerException을 일으킴으로 이를 이용해 코드를 작성할 수 있다.
+    </blockquote><br>
+
+    <h3>1.8.3 배열 리스트</h3>
+
+    ---
+
+    ArrayList
+    <blockquote>
+    배열은 미리 길이를 알아야 하고, 한번 생성하면 절대로 길이를 변경할 수 없다. 이러한 단점을 보완하기 위해 나온 자료구조가 ArrayList이다. 이 객체는 내부에서 배열을 관리하고, 개발자에게는 보이지 않는다.<br><br>
+
+    ArrayList는 제레닉 클래스(generic class), 즉 타입 매개변수가 있는 클래스이다. 제네릭은 <>를 통해 타입을 지정한다.
+    </blockquote><br>
+
+    ```java
+    ArrayList<String> friends;
+    friend = new ArrayList<>();
+    // ==
+    firend = new ArrayLi<String>();
+    ```
+
+    컴파일러는 변수의 타입에서 타입 매개변수를 추론한다. 
+    위 호출에서 생성 인수가 없지만, 그럼에도 끝내 ()를 붙여야 한다. 결과는 크기가 0인 배열 리스트.<br><br>
+
+    ```java
+    ArrayList<String> friends = new ArrayList<>(List.of("Peter", "Paul"))
+    // List.of 메서드는 지정한 요소들로 구성된 수정 불가능한 리스트를 반환한다.
+    // 배열 리스트용 초깃값 지정 문자가 없기에 위처럼 초기화 해주어야 한다.
+
+    friends.add(1, "moon");    // 인덱스 1자리에 moon이 추가되고 그 뒤의 배열들은 밀림.
+    friends.remove(2);         // 2인덱스 삭제.
+    firstName = firends.get(1) // 1번 인덱스 값 불러옴.
+    firends.set(1, "song")     // 1번 인덱스 값 moon -> song 으로 변경.
+    firends.size()             // 리스트의 현재 크기를 돌려줌.
+    ```
+
+    <br>
+    <h3>1.8.4 기본 타입의 래퍼 클래스</h3>
+    
+    ---
+
+    제네릭 클래스는 기본 타입을 타입 매개변수로 사용할 수 없다는 불편한 제약이 존재한다. 따라서 이 해결책으로 래프 클래스(wrapper class)를 사용한다. 래퍼 클래스 (Byte, Short, Integer, Long, Float, Double, Character, Boolean)는 등이 존재한다.
+
+    ```java
+    ArrayList<Integer> numbers = new ArrayList<>();
+    numbers.add(42);
+    int first = numbers.get(0);
+    // 정수형 배열 리스트 생성 -> 배열 리스트 에 42 추가 -> first에 정수형 숫자 
+    ```
+
+    기본 타입과 래퍼타의 변환은 자동으로 일어난다.
+
+    1. add를 호출할 때, 오토박싱(autoboxing)을 거쳐 42를 담은 Integer 객체를 생성
+    2. int형 변수 first에 넣기 전에 Integer 내부의 int 값을 돌려주도록 언박싱(unboxing)된다.
+    <br><br>
+    <blockquote>
+    Caution
+
+    연결 리스트 내부에 존재하는 값은 래퍼 타입의 객체이므로 이 객체끼리 비교할 때는 equals를 사용한다.
+    </blockquote><br>
+    <h3>1.8.5 향상된 for 루프</h3>
+
+    ---
+
+    ```java
+    int sum = 0;
+    for (int i = 0; i < numbers.length; i++) {
+        sum += numbers[i];
+    }
+    // 위는 numbers 의 길이만큼 그 내부 값을 탐색한다.
+
+    int sum = 0;
+    for (int n : numbers) {
+        sum += n;
+    }
+    // 위 향샹된 루프는 배열의 인덱스 값이 아닌 요소를 순회한다(배열 리스트도 사용 가능).
+    ```
+
+    <br>
+
+    <h3>1.8.6 배열과 배열 리스트 복사</h3>
+
+    ---
+
+    배열 변수를 다른 배열 변수로 복사하게 되면, 두 변수는 같은 배열을 참조하게 된다. 이렇게 되면 하나의 배열 변수를 고쳐도 뜻하지 않은 다른 배열 변수도 함께 수정되거나 삭제될 수 있다. 따라서 배열의 사본을 만들어 복사해야 한다.
+
+    ```java
+    int[] copiedPrimes = Arrays.copyOf(primes, primes.length);
+    // 위는 새 배열을 원하는 길이로 생성, 원본 배열의 요소를 복사한다.
+    ```
+
+    배열 리스트를 복사하기 위해서는 기존 배열 리스트에서 새 배열 리스트를 생성해야 한다. 
+
+    ```java
+    ArrayList<String> friends = new ArrayList<>(List.of("Peter", "Paul"));
+    ArrayList<String> people = friends;
+    people.set(0, "Mary"); // friends.get(0)의 값도 "Mary"가 됨.
+
+    ArrayList<String> copiedFriends = new ArrayList<>(friends);
+    copiedFriends.set(0, "moon");
+    System.out.println(friends);            // [Peter, Paul]
+    System.out.println(copiedFriends);      // [moon, Paul]
+    // 위 코드는 같은 곳 참조 x.
+
+    String[] names = { "moon", "na", "kim", "won" };
+    ArrayList<String> friends = new ArrayList<>(List.of(names));
+    System.out.println(friends);
+    // [ "moon", "na", "kim", "won" ]
+    // 배열을 배열 리스트에 복사할 때는 위처럼 Lise.of 메서드를 사용해 생성하면 된다.
+
+    String[] names1 = friends.toArray(new String[0]);
+    for (String n : names1) {
+        System.out.printf("%s ", n);
+    }
+    // moon na kim won
+    // 배열 리스트를 배열에 복사한다. 하위 호환성 때문에 반드시 올바른 타입으로 된 배열을 전달해야 한다.
+    ```
+
+    <br>
+
+    <h3>1.8.7 배열 알고리즘</h3>
+    
+    ---
+
+    - Arrays 와 Collections 클래스는 배열과 배열 리스트에서 자주 사용하는 알고리즘을 구현한다.
+    - Array.fill → 배열을 채운다.
+    - Collections.fill → 배열 리스트를 채운다.
+    - Arrays.sort → 배열을 정렬한다. (parallelSort 는 대상이 클 때 사용하고, 배열 리스트는 사용할 수 없다.)
+    - Collections.sort → 배열 리스트를 정렬한다.
+    - Collections.reverse → 요소들을 뒤집는다.
+    - Collections.shuffle → 요소들을 임의로 섞는다.
+    
+    <br>
+
+    Arrays.toString 메서드는 배열을 문자열로 표현한 결과를 돌려준다.
+
+    ```java
+    System.out.println(Arrays.toString(primes));
+    // [2, 3, 4, 5, 6, 10, 12] 을 출력.
+
+    String elements = friends.toString();
+    // elements 를 "[Peter, Paul]" 로 설정.
+
+    // 출력할 때는 println 메서드가 알아서 toString을 처리한다.
+    ```
+
+    <br>
+
+    <h3>1.8.8 명령줄 인수</h3>
+
+    ---
+
+    Java program의 main method는 문자열의 배열을 매개변수로 받는다. 프로그램을 실행하면 매개변수가 명령줄 (command line)에서 지정한 인수들로 설정된다.
+
+    <br>
+
+    <h3>1.8.9 다차원 배열</h3>
+
+    ---
+
+    자바는 배열의 배열로 다차원 배열을 구현한다. 각 행의 요소의 개수가 같지 않을 수 있다. 단지 객체에서 다른 객체를 참조하는 것 뿐.
+
+    ```java
+    int[][] arr_2 = {
+        { 1, 2, 3, 4 },
+        { 5, 6, 7 }
+    };
+    // arr_2[0] 은 { 1, 2, 3, 4 } 를 담고 있는 객체를 참조하고 있다.
+    // arr_2[1] 은 { 5, 6, 7 } 를 담고 있는 객체를 참조하고 있다.
+    // arr_2[0][2]는 3이라는 변수에 접근 가능하다.
+
+    int[] temp = arr_2[0];
+    arr_2[0] = arr_@[1];
+    arr_2[1] = temp; 
+    // 이렇게 행을 맞바꿀 수도 있다.
+
+    // 만일 초기값을 제공하지 않을 때는 반드시 new연산자를 사용하고 행과 열의 개수를 지정해야 한다.
+    int[][] arr_ = new int[4][4];
+    int[][] arr_3 = new int[4][];
+    // 위 둘다 가능하다.
+
+    int[][] arr = new int[4][4];
+    arr[1] = new int[]{1, 2, 3};
+    arr[2] = {1, 2, 3}; // 오류 발생. new int[] 를 사용하여 객체를 생성해주어야 한다.
+
+    // 순환
+    for (int i = 0; i < arr_2.length; i++){
+        for (int j = 0; j < arr_2[i].length; j++) {
+            System.out.printf("%d ", arr_2[i][j]);
+        }
+        System.out.println();
+    }
+    for (int[] row : arr_2) {
+        for (int element : row) {
+            System.out.printf("%d ", element);
+        }
+        System.out.println();
+    }
+    // 위 둘다 한번씩 순환한다.
+    ```
