@@ -241,3 +241,133 @@
     <blockquote>
     boolean 타입 값은 false와 true 두 개뿐이다. 자바에서 boolean은 숫자 타입이 아니고 boolean값과 정수 0, 1사이에는 아무 관련이 없다.
     </blockquote>
+        <br><br>
+    <h2>1.3 변수</h2>
+
+    ---
+
+    
+    변수와 상수를 선언하고 초기화하는 법을 배운다.<br><br>
+    <h3>1.3.1 변수 선언</h3>
+
+    ---
+
+    자바는 타입 결합이 강한 언어디므로 각 변수에는 해당 타입 값만 저장할 수 있다. 변수를 선언할 때는 타입과 이름을 지정해야 하고, 필요하면 초깃값을 지정할 수도 있다.
+
+    ```java
+    int total = 0;
+
+    // 타입이 같은 변수 여러 개를 한 문장으로 선언 가능.
+
+    int total = 0, count
+
+    // 여기서 count는 초기화되지 않은 정수이다.
+
+    Random generator = new Random();
+
+    // 객체의 클래스 이름을 두 번 사용했다. 첫 번째 Random 은 generator 변수의 타입이고,
+    // 두번째 Random 은 이 클래스의 객체를 생성하는 new 표현식의 일부이다.
+    ```
+    <br>
+    <h3>1.3.2 변수 이름</h3>
+
+    ---
+    - 변수 이름은 반드시 문자로 시작. (메서드와 클래스도 동일)<br>
+    - 변수 이름은 문자, 숫자, 기호 _와 \$로 구성 가능, 하지만 \$는 자동으로 생성되는 이름이기에 직접 이름을 지을 때는 사용하지 않음. 자바 9부터는 _자체는 명령어로 등록되어 단독 사용시에 오류 발생. <br>
+    - 문자와 숫자는 라틴 알파벳에 한정되지 않아 모든 알파벳으로 구성 가능. 또한, 자바는 대, 소문자를 구분하기에 count와 Count는 다른 이름으로 인식됨. 이름에는 공백과 기호가 사용 불가하고, double처럼 예약어(명령어)도 사용이 불가능.<br>
+    - 일반적으로 변수와 메서드의 이름은 소문자로 시작, 클래스 이름은 대문자로 시작. 자바 프로그래머는  낙타 표기법을 선호하며 그 정의는 countOfInvalidInputs처럼  여러 단어로 구성되어 있을 때, 각 단어의 첫 글자를 대문자로 쓰는 것을 의미함.
+
+
+    <br><br>
+    <h3>1.3.3 변수 초기화</h3>
+
+    ---
+
+    메서드 안에 변수를 선언했다면, 해당 변수를 반드시 초기화한 후에 사용해야 한다.
+
+    ```java
+    int count;
+    count++; // 오류 발생 - 초기화되지 않은 변수 사용.
+
+    int count;
+    int (total == 0) {
+        count = 0;
+    } else {
+        count++; // 오류 발생 - 초기화되지 않은 변수 사용.
+    }
+
+    // 컴파일러는 변수를 사용하기 전에 초기화했는지 검증한다.
+    // 위의 두번째 코드는 total이 0일시에 오류가 나지 않지만, 
+    // 컴파일러는 else문까지도 미리 탐색하기에 오류가 발생한다.
+
+    Scanner in = new Scanner(System.in); 
+    System.out.println("How old are you?");
+    int age = in.nextInt();
+
+    // 위 코드는 변수를 변수의 초깃값으로 사용할 값을 얻는 시점에 선언했다.
+    // 이처럼 변수를 사용하기 직전까지 변수 선언 시기를 늦추는 것이 좋은 방식이다.
+    ```
+    <br>
+
+    <h3>1.3.4 상수</h3>
+
+    ---
+
+    final 키워드는 한번 할당하면 변경할 수 없는 값에 사용한다. 다른 언어에서는 이 값을 상수(constant)라고 한다.
+
+    ```java
+    final int DAYS_PER_WEEK = 7;
+
+    // 보통 상수 이름은 전부 대문자로 선언.
+
+    public class Calendar {
+        public static final int DAYS_PER_WEEK = 7;
+    }
+    // 위처럼 static 키워드로 상수를 메서드 외부에 선언할 수도 있다.
+    // 그렇게 되면, Calendar 내부에서는 이 상수를 DAYS_PER_WEEK로 참조하고,
+    // 이 상수는 여러 메서드에서 사용할 수 있다.
+    // 다른 클래스에서 참조하기 위해서는 Calendar.DAYS_PER_WEEK 로 접근한다.
+    ```
+    <blockquote>
+    Tip.
+
+    System 클래스에는 다음 상수가 선언되어 있기에 어디서나 System.out으로 사용될 수 있다.
+    public static final PrintStream out (out은 PrintStream 타입으로 선언),
+    out은 상수이지만, 대문자를 쓰지 않는다.
+    </blockquote>
+    
+
+    ```java
+    final int DAYS_IN_FEBRUARY;
+    if (leapYear) {
+        DAYS_IN_FEBRUARY = 29;
+    } else {
+        DAYS_IN_FEBRUARY = 28;
+    }
+    // 일단 값을 할당하면 최종 값이 되어 절대로 변경할 수 없다. 
+    ```
+
+    final 변수는 사용 전에 한번만 초기화 하면, 초기화를 나중으로 미룰 수 있다. 이래서 ‘최종’ 변수라는 이름이 붙었다. 위는 final 초기화 규칙을 만족하는 코드이다.
+    
+    <br>
+    <blockquote>
+    Tip. (열거타입)
+
+    서로 관련 있는 상수의 집합이 필요할 때 사용하는 enumerated type을 정의하면 된다.
+
+    ```java
+    public static final int MONDAY = 0;
+    public static final int TUESDAY = 1;
+    public static final int WEDNESDAY = 2;
+    public static final int THURSDAY = 3;
+    public static final int FRIDAY = 4;
+    public static final int SATURDAY = 5;
+    public static final int SUNDAY = 6;
+
+    enum Weekday { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY };
+
+    // 위처럼 열거 타입을 사용하면 월요일에 접근할 때, Weekday.MONDAY 로 접근하여 사용할 수 있다.
+    // Weekday 변수를 선언하고 초기화하는 방법은 아래와 같다.
+    Weekday startDAY = Weekday.MONDAY;
+    ```
+    </blockquote>
