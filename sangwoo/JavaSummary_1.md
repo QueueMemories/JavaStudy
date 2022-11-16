@@ -371,3 +371,196 @@
     Weekday startDAY = Weekday.MONDAY;
     ```
     </blockquote>
+        <br>
+
+    <h2>1.4 산술 연산</h2>
+
+    ---
+
+    자바는 c언어에 기반을 둔 언어로써 c에서 사용하는 연산자와 거의 비슷하다.
+
+    <image src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F997A014D5A90B9B00D">
+
+    위 표는 우선순위에 따라 내림차순으로 연산자를 나열한 기법이다. 
+
+    ex) i -= j -= k 여기서 -=는 오른쪽으로 결합하므로 i -= (j -= k) 가 된다.
+
+    
+    <br>
+    <h2>1.4.1 할당</h2>
+
+    ---
+
+    “=” 은 할당 연산자이다.
+
+    ```java
+    x = 10;
+    // 이 문장은 x를 10으로 설정한다.
+
+    x -= 5; 
+    // 연산자 뒤에 =을 붙인 복합 할당 연산자는 연산자의 왼쪽과 오른쪽을 결합한 후 결과를 왼쪽에 해당한다.
+    ```
+    <br>
+    <h3>1.4.2 기본 계산</h3>
+
+    ---
+
+    덧셈, 뺄셈, 곱셈, 나눗셈이 해당된다. 여기서 주의할점은 나눗셈인데, “/”로 사용하는 나눗셈은 두 피연산자가 정수 타입이면 정수 나눗셈을 의미해 나머지를 버리게 된다. 
+
+    ```java
+    result = 17.0 / 5;
+    // result == 3.4
+
+    result = 17 / 5;
+    // result == 3
+    ```
+
+    또한, 모든 정수를 0으로 나누게 되면 예외가 발생한다. 이 예외를 잡지 않으면 프로그램을 종료한다. 여기서 눈여겨 볼 점은 부동소수점을 0으로 나누게 될 때인데, 이때는 프로그램을 종료하지 않고 결과로 무한대 값이나 NaN이 나온다.
+    <br><br>
+    % 연산자는 나머지를 돌려준다.
+
+    ```java
+    result = 17 % 5;
+    // result == 2
+    // 만약 a % b == 0 이면, a는 b의 정수배이다.
+    ```
+
+    만일 원하는 숫자가 0 ~ 11 사이라면, value % 12 를 통해 간단하게 얻을 수 있다. 하지만, 음수를 나누게 되면 0 ~ -11 사이의 수가 나올 수도 있다. 따라서 이럴 경우 Math.floorMod(value, 12)를 사용한다.
+    <br><br>
+    <blockquote>
+    증가 연산자 : n++; // n에 1을 더한다.
+
+    감소 연산자 : n—; // n에 1을 뺀다.
+
+    n++ 와 ++n 의 차이점
+
+    둘다 n을 1 증가시키지만, 표현식 내부에서는 서로 다른 값이 된다. n++는 증가 이전 값을, ++n은 증가 이후 값을 돌려준다. ex) String arg = args[n++] → 이는 arg를 args[n] 값으로 설정한 후, n을 1증가시킨다.
+    <br><br>
+    컴파일러가 코드 최적화를 잘 하지 못하던 예전에는 효율적인 방법이였지만, 현재는 두 문장으로 나누어도 수행 성능이 떨어지지 않으며, 많은 개발자들은 두 문장으로 나눈 형태가 더 읽기 쉽다고 생각한다. 
+    </blockquote><br>
+
+    <h3>1.4.3 수학 메서드</h3>
+    
+    ---
+
+    ```java
+    Math.pow(x, y) // x를 y번만큼 곱함(제곱 연산).
+    Math.sqrt(x)   // x의 제곱수를 구함.
+    Math.max(x, y) // 두 값의 최댓값을 구함.
+    Math.min(x, y) // 두 값의 최솟값을 구함.
+
+    int value = 1000000000 * 3;
+    System.out.println(value);
+    // -1294967296
+
+    int value = Math.multiplyExact(1000000000, 3);
+    System.out.println(value);
+    // Exception in thread "main" java.lang.ArithmeticException: integer overflow
+
+    // 이상한 값 대신 에러처리 가능.
+    Math.addExact(x, y)        // 덧셈.
+    Math.subtractExact(x, y)   // 뺄셈.
+    Math.multiplyExact(x, y)   // 곱셈.
+    Math.incrementExact(x)     // 1을 추가.
+    Math.decrementExact(x)     // -1을 추가.
+    Math.negateExact(x)        // 부호 변경.
+    Math.toIntExact(x)         // long -> int 변경.
+    // 이는 모두 int와 long 매개변수 버전을 제공한다.
+
+    // -- example --
+    int value = 1000000000 * 3;
+    System.out.println(value);
+    // -1294967296
+
+    int value = Math.multiplyExact(1000000000, 3);
+    System.out.println(value);
+    // Exception in thread "main" java.lang.ArithmeticException: integer overflow
+    ```
+
+    위 메서드들은 정적(static) 메서드이기에 객체(instance)로 호출할 수 없다. 따라서 ‘.’연산자를 이용해 접근해야 한다.
+    <br><br>
+    <h3>1.4.4 숫자 타입 변환</h3>
+
+    ---
+
+    <blockquote>
+    연산을 하고자 할 때, 피 연산자의 숫자 타입이 다르다면 연산될 피 연산자들의 숫자를 공통 타입으로 변환 후 결합한다.
+
+    1. 둘중 하나가 double 타입이면 double로 변환.
+    2. 둘중 하나가 float 타입면 float로 변환.
+    3. 둘중 하난가 long 타입이면 long로 변환.
+    4. 나머지는 int로 변환.
+
+    합법적 변환 (정보 손실이 없는 경우에만 해당)
+
+    - byte → short, int, long, double
+    - short → int, long, double
+    - int → long, double
+    </blockquote>
+    <br>
+    허용되는 것을 제외한 변환을 수행할 때는 캐스트 연산자를 사용해야 한다.
+
+    캐스트연산자 - 대상 타입의 이름을 괄호 안에 넣은 형태
+
+    ```java
+    double x = 3.75;
+    int n = (int)x;
+    // n == 3
+    ```
+
+    타입 변환 대신 가까운 정수로 반올림하고 싶을 때는 Math.round 메소드를 사용한다. 이 메소드의 반환값은 long타입이기 때문에, int 변수에 넣기 위해서는 (int)Math.round(x); 를 해주면 된다.
+
+    ```java
+    int n = 1;
+    char next = (char)('J'+n) 
+    // 1. char 타입과 int 타입이므로 둘다 int타입으로 변환되어 계산
+    // 2. 계산된 75를 char타입으로 변환 == 'K'
+    ```
+
+    long 타입을 int 타입으로 캐스트 연산자를 사용해 강제로 변환하면 하위 바이트들만 보존되므로, 이 경우에는 Math.toIntExact() 함수를 사용하여 오류를 처리하는게 좋다.
+
+    <br>
+    <h3>1.4.5 관계 연산자와 논리 연산자</h3>
+
+    ---
+
+    ```java
+    // == -> 같다.
+    // != -> 다르다.
+    // && (논리곱) -> 둘다 true일 때,
+    // || (논리합) -> 둘중 하나라도 true일 때,
+    // ! (논리부정) -> ~이 아닐때,
+    // ? (조건) -> 조건 한개와, 값 두개가 존재할 때, true면 첫 번째 값이 되고, false면 두 번째 값이 된다.
+    ```
+    <blockquote>
+    단락 평가(short circuite valuation)는 두 번째 조건이 오류를 일으킬 가능성이 있을 때 유용하다. 논리곱과 논리합이 단락 평가에 해당하며, &&(논리곱)은 첫 번째 조건이 false시 두 번째 조건은 평가하지 않고, ||(논리합)은 첫 번째 조건이 true면 두 번째 조건은 평가하지 않는다. 따라서 두 번째 조건에 오류가 나는 상황이라도 평가하지 않기에 오류를 일으킬 가능성이 있을 때 유용하다.
+    </blockquote><br>
+    <h3>비트 단위 연산자</h3>
+
+    ```java
+    // & (and, 비트곱) -> 둘다 1일때,
+    // | (or, 비트합) -> 하나라도 1일때,
+    // ^ (xor, 배타적 비트합) -> 둘 중 하나만 1일때.
+    // ~ (연산자의 !에 해당) -> 인수의 모든 비트를 뒤집는다.
+    ```
+
+    <br>
+    <h3>1.4.6 큰 숫자</h3>
+
+    ---
+
+    BigInteger, BigDecimal
+
+    BigInteger 클래스는 임의로 정밀도 정수 연산을 구현, BigDecimal 클래스는 부동소수점 수에 동일 동작을 구현한다. 정적 메서드인 valueOf는 long을 BigInteger로 변환한다.
+
+    ```java
+    BigInteger n = BigInteger.valueOf(123456789012345678L);
+    BigInteger k = new BigInteger(123456789012345678);
+
+    // BigInteger에 미리 정의된 상수로 BigInteger.ZERO, BigInteger.ONE, BigInteger.TWO, 
+    // BigInteger.TEN 등이 있다.
+    // Java에서는 객체에 연산자를 사용할 수 없으므로 큰 숫자를 다룰 때는 반드시 메서드를 호출해야 한다.
+
+    BigInteger r = BigInteger.valueOf(5).multiply(n.add(k));
+    // r = 5 * (n + k)
+    ```
