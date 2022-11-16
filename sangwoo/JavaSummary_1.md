@@ -1291,3 +1291,80 @@
     }
     // 위 둘다 한번씩 순환한다.
     ```
+
+    <br>
+
+    <h2>1.9 기능적 분해</h2>
+
+    ---
+
+    <h3>1.9.1 정적 메서드 선언 및 호출</h3>
+
+    ---
+
+    ```java
+    public static double average (double x, double y) {
+        return x + y;
+    }
+    // 메서드 헤더(메서드 선언부)
+    // 반환 값의 타입, 메서드 이름, 매개변수의 타입과 이름
+
+    // 메서드 바디(메서드 구현부)
+    // 구현할 내용을 채워 넣고, 반환할 결과는 return을 사용한다.
+    ```
+
+    <br>
+
+    <h3>1.9.2 배열 배개변수와 반환 값</h3>
+
+    ---
+
+    배열을 메서드에 전달할 수 있다. 메서드는 배열에 대한 참조를 받으며, 이 참조로 전달받은 배열을 변경할 수 있다.
+
+    ```java
+    public static void swap(int[] values, int i, int j) {
+        int temp = values[i];
+        values[i] = values[j];
+        values[j] = temp;
+    }
+    // 위는 두 요소를 맞바꾸는 메서드이고 다른 반환값없이 참조하는 배열의 내부 요소를 바꿀 수 있다.
+
+    public static int[] fristLast(int[] values) {
+        if (values.length == 0) return new int[0];
+        else return new int[] {values[0], values[values.length - 1]};
+    }
+    // 메서드는 배열을 반환할 수 있다.
+    ```
+
+    <br>
+
+    <h3>1.9.3 가변 인수</h3>
+
+    ---
+
+    호출하는 쪽에서 인수를 원하는 개수만큼 넘길 수 있게 하는 메서드이다. ex) printf
+
+    <br>
+
+    임의의 개수의 수를 받아 평균을 구하는 코드
+
+    ```java
+    public static double average(double ... values) {
+        double sum = 0;
+        for (double v : values) sum += v;
+        return values.length == 0 ? 0 :sum / values.length;
+    }
+    // 타입 뒤에 ..을 붙여서 '가변 인수(varargs)' 매개변수를 선언한다.
+    // values 매개변수는 double 타입 배열이 된다. 메서드를 호출할 때 배열이 생성되고,
+    // 호출 하는 쪽에서 전달한 인수들로 채워진다. 배열을 인수로 전달 가능하다.
+
+    // 다른 매개변수를 가변 매개변수 앞에 둘 수 있다.
+    // 가변 매개변수는 반드시 매개변수의 마지막 매개변수여야 한다.
+    public static double max(double first, double ... rest) {
+        double result = first;
+        for (double v : rest) result = Math.max(v, result);
+        return result;
+    }
+    // 첫번째 들어오는 인수를 기본 값으로 설정후,
+    // 뒤이어 들어오는 인수들을 기본 값과 비교.
+    ```
