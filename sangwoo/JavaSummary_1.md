@@ -111,3 +111,133 @@
     
     자바를 스크립트 언어처럼 간단하게 사용해 볼 수 있게 해주는 출력 도구이지만, 실제 개발을 할 때에 쓰이긴 어렵다.
     </blockquote>
+            <br><br>
+    <h2>1.2 기본 타입</h2>
+
+    ---
+    <blockquote>
+    자바는 객체 지향 언어이지만, 그렇다고 해서 자바의 모든 값이 객체는 아니다. 몇 가지 값은 기본 타입(primitice type) 에 속한다. 기본 타입 중 네 가지(byte, short, int, long)는 부호 있는 정수 타입이고, 두 가지(float, double) 는 부동소수점 타입, 하나는 문자열 인코딩에 사용하는 문자 타입인 char, 나머지 하나는 진릿값을 나타내는 boolean 타입이다.
+    </blockquote>
+    <br>
+    기본 타입 범위.
+    <table border="1">
+    <th>타입</th>
+    <th>저장공간</th>
+    <th>범위(포함)</th>
+    <tr>
+        <td>byte</td>
+        <td>1바이트</td>
+        <td>-128 ~ 127</td>
+    </tr>
+    <tr>
+        <td>short</td>
+        <td>2바이트</td>
+        <td>-32.768~32.767</td>
+    </tr>
+    <tr>
+        <td>int</td>
+        <td>3바이트</td>
+        <td>-2.147,483,648~2,147.483,647(20억이 넘음)</td>
+    </tr>
+    <tr>
+        <td>long</td>
+        <td>4바이트</td>
+        <td>-9,223,372.036,854,775,808~9,223,372,036,854,775,807</td>
+    </tr>
+    </table>
+    <br>
+    <h3>1.2.1 부호 있는 정수 타입</h3>
+
+    ---
+    <blockquote>
+    Integer.MIN_VAlUE 상수는 가장 작은 정수 값, Integer.MAX_VALUE는 가장 큰 정수 값을 나타낸다. Long, Short, Byte 클래스에도 MIN_VALUE와 MIN_VALUE 상수가 있다.
+    <br>if) long 타입보다 큰 수가 있을 때는, BigInteger 클래스를 사용하여 처리한다.
+    </blockquote>
+    <br>
+    자바 정수 타입 범위
+    <blockquote>
+    프로그램을 실행하는 머신과 상관없이 동일하다. C나 C++로 작성한 프로그램은 컴파일하는 프로세서에 따라 정수 타입이 다르다.
+    </blockquote>
+    <br>
+    진수 표기법
+    <blockquote>
+    long 정수 리터럴은 접미어 L을 붙여서 작성한다(400L). byte나 short 타입 리터럴을 작성하는 문법은 없다. 따라서 캐스트 표기법을 사용한다.
+    16진수는 0x를 붙여 작성. 2진수는 0b를 붙여서 작성한다.
+    8진수는 0 을 붙여 사용한다. 011 은 9 이렇게 하지만 이런 형태는 혼동을 줄 수도 있으니 가급적 사용하지 않는게 좋다.
+    숫자 리터럴은 밑줄()을 붙일 수 있다. 백만은 1_000_000 또는 0b1111_0100_0010_0100_0000 이렇게 나타낼 수 있다.
+    </blockquote>
+    <br><br>
+    <h3>1.2.2 부동소수점 타입</h3>
+
+    ---
+
+    부동 소수점 타입은 소수점 부분이 있는 숫자를 나타낸다.<br><br>
+    부동 소수점 범위.
+    <table border="1">
+    <th>타입</th>
+    <th>저장공간</th>
+    <th>범위</th>
+    <tr>
+        <td>float</td>
+        <td>4바이트</td>
+        <td>약 43 40282347E+38F(유효자릿수 6~7)</td>
+    </tr>
+    <tr>
+        <td>double</td>
+        <td>8바이트</td>
+        <td>약 ±179769313486231570E+308(유효자릿수 15)</td>
+    </tr>
+    </table>
+    <br>
+    float 사용법<br>
+    <blockquote>
+    float 는 4바이트이고, 사용하기 위해서는 리터럴에 접미어 F를 붙어야 한다. 붙이지 않으면 자동으로 double 타입이 된다.
+    </blockquote><br>
+
+    Double 속성의 예외<br>
+    <blockquote>
+    무한대를 나타내는 Double.POSITIVE_INFINITY, 음의 무한대를 나타내는 Double.NEGATIVE_INFINITY, 숫자가 아니라는 것 을 나타내는 Double.NaN 등 특별한 부동소수점 값이 있다.
+    </blockquote><br>
+
+    비교하는 방법의 예외 처리<br>
+    <blockquote>
+    숫자가 아닌 값을 검사할 때는 if (x == Double.NaN) 으로 작성해서는 x가 NaN인지 검사할 수 없다. if (Double.isNaN(x))로 작성해야 검사할 수 있다. Double.isInfinite로는 무한대를 테스트하고, Double.isFinite로는 부동소수점 수가 무한대도 아니고 NaN도 아닌지 검사할 수 있다.<br>
+    </blockquote><br>
+    <br>
+    부동 소수점 수는 금융 계산에는 적합하지 않다. 금융 계산은 반올림 오류를 용납하지 않기 때문이다.
+
+    ```java
+    System.out.println(2.0 - 1.1)
+    // 0.8999999999999999
+    ```
+    <blockquote>
+    위의 경우, 0.9가 아닌 다른 값을 출력한다. 따라서 임의의 정밀도로 반올림 오류가 없는 정확한 숫자 계산이 필요할 때는 부동 소수점 수를 사용하지 않고, BigDecimal 클래스를 사용해야 한다.
+    </blockquote><br>
+
+    ```java
+    BigDecimal.valueOf(2, 0).subtract(BigDecimal.valueOf(11, 1));
+    // 0.9
+    ```
+    BigDecimal.valueOf(n, e)를 호출하면 값이 $n * 10^-e$ 인BigDecimal 인스턴스를 반환한다.
+    <br>
+    <h3>1.2.3 char 타입</h3>
+    
+    ---
+
+    <blockquote>
+    char 타입은 자바가 사용하는 UTF-16 문자 인코딩의 ‘코드 유닛(code unit)’을 나타낸다.
+
+    ex) ‘J’ 는 값이 74(16진수로는 4A)인 문자 리터럴로 유니코드 문자 ‘U+004A(라틴 대문자 J)’를 나타내는 코드 유닛이다. 접두어 \u를 사용해 코드 유닛을 16진수로 나타낼 수도 있다(’\u263A’는 ‘J’).
+
+    특수 코드 ‘\n’, ‘\r’, ‘\t’, ‘\b’ 는 각각 라인피드 (line feed), 캐리지 리턴(carriage return) - 출력 위치를 맨 앞으로 이동, 탭(tab), 백스페이스(backspace)를 나타낸다.
+
+    ‘’ 와 \ 를 나타내기 위해서는 \로 이스케이프(escape)한다(\’ ,  \\). 
+    </blockquote><br>
+
+    <h3>1.2.4 boolean 타입</h3>
+    
+    ---
+
+    <blockquote>
+    boolean 타입 값은 false와 true 두 개뿐이다. 자바에서 boolean은 숫자 타입이 아니고 boolean값과 정수 0, 1사이에는 아무 관련이 없다.
+    </blockquote>
