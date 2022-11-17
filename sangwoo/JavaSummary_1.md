@@ -634,7 +634,10 @@
     // location의 리터럴 값이 "world" 라면 true
 
     location.equals("world");
-    // location의 리터럴 값이 대소문자가 섞인 world라면 true를 반환한다.
+    // location의 리터럴 값이 대소문자가 섞인 world라면 false를 반환한다.
+
+    // 대소문자를 구분하지 않고 두 문자열을 비교하기 위해서는 equalsIgnoreCase 메서드를 사용한다.
+    loaction.equalsIgnoreCase("world");
 
     "first".compareTo("second");
     // 오름차순으로 한 문자열이 또 다른 문자열보다 앞에 오는지를 알려준다.
