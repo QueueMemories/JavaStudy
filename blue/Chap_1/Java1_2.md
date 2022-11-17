@@ -33,7 +33,7 @@
     - F를 붙이지 않을 경우 double 타입이 된다. ( double 타입은 선택적으로 접미어 D를 붙인다 )
 - 무한대를 나타내는 Double.POSITIVE_INFINITY, 음의 무한대를 나타내는 Double.NEGATIVE_INFINITY, 숫자가 아니라는 것을 나타내는 Double.NaN 등 특별한 부동소수가 있다.
 - 숫자가 아닌 값은 모두 서로 다른 값으로 간주 ⇒ if( x == Double.NaN ) 을 작성해서는 x 가 NaN 인지 검사 불가능
-    - if ( Double.is(NaN)) 작성하여 검사 가능
+    - if ( Double.isNaN(x)) 작성하여 검사 가능
     - Double.isInfinite 로는 ±∞ 를 테스트
     - Double.isFinite 로는 부동 소수점 수가 무한대고 아니고 NaN도 아닌지 검사 가능
 <br>
