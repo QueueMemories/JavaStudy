@@ -184,7 +184,7 @@ for (String name : friends) {
 Arrays.fill(numbers, 0); // int[] 배열
 Collections.fill(friends, ""); // ArrayList<String>
 
-// 배열이나 배열 ㄹ리스트를 정렬할 때 sort 메서드 사용
+// 배열이나 배열 리스트를 정렬할 때 sort 메서드 사용
 Arrays.sort(names);
 Collections.sort(friends);
 ```
@@ -219,7 +219,7 @@ Collections.shuffle(names); // 요소들을 임의로 섞음
     ⇒ `public static void main(String[] args)`
     
 - 프로그램을 실행하면 매개변수가 명령줄(command line) 에서 지정한 인수들로 설정된다.
-
+- intelliJ 에서 run 설정의 edit Configuration의 Program Argument에 java Greeting -g cruel world 를 입력한뒤 다음 코드를 실행
 ```java
 public class Greeting {
 	public static void main(String[] args) {
@@ -232,7 +232,7 @@ public class Greeting {
 	}
 }
 
-// args[0]은 "-g", args[1]은 "cruel", args[2]는 "world"가 된다.
+// args[0]은 "java", args[1]은 "Greeting", args[2]는 "Goodbye", args[3]은 "cruel", args[4]는 "Hello"가 된다.
 ```
 
 - java Greeting -g cruel world

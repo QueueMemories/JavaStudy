@@ -66,7 +66,7 @@
 - final 키워드는 한번 할당하면 변경 불가능한 값에 사용함 ⇒ 다른 언어에서 이 값을 상수라고 한다.
 
 ```java
-final in DAYS_PER_WEEK = 7; // 상수 이름은 대문자로 선언하는 관례
+final int DAYS_PER_WEEK = 7; // 상수 이름은 대문자로 선언하는 관례
 
 public class Calendar {
 	public static final int DAYS_PER_WEEK = 7; 

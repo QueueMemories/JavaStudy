@@ -46,7 +46,7 @@ String result = builder.toString();
 
 ```java
 String greeting = "Hello, World";
-String location = greeting.substing(7, 12); // location 을 "World"로 설정한다.
+String location = greeting.substring(7, 12); // location 을 "World"로 설정한다.
 ```
 
 - substring 메서드의 첫 번째 인수는 추출할 부분 문자열 시작위치, 문자열의 위치는 0부터 시작
@@ -70,7 +70,7 @@ String[] result = names.split(","); // 문자열 세 개로 구성된 배열 ["P
 ```java
 // 주의
 String greeting = "Hello, World";
-String location = greeting.substing(7, 12);
+String location = greeting.substring(7, 12);
 location == "World"; // false 반환
 ```
 
