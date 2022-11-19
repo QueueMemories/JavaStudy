@@ -97,4 +97,164 @@ String, LocalData 처럼 클래스 내부에 변경자 메서드가 없다면, �
 Caution
 
 null로 메서드를 호출하면 NullPointerException이 일어난다(내부 뜻은 NullReferenceException). 이래서 null을 넣기보다 Optional 타입을 넣는 것을 권장한다.
+</blockquote><br><br>
+
+<h2>2.2 클래스 구현</h2>
+
+<h3>2.2.1 인스턴스 변수</h3>
+
+자바에서는 인스턴스 변수(instance variable)로 객체의 상태를 나타낸다.
+
+```java
+public class Employee {
+	private String name;
+	private double salary;
+}
+// 위는 상태를 나타낸다
+```
+
+위 선언은 Employee 클래스의 모든 인스턴스는 name과 salary 변수를 가진다는 의미이다.
+
+인스턴스 변수는 주로 private로 선언하는데, 이는 같은 클래스에 속한 메서드만 변수에 접근할 수 있도록 하는 것이다. 
+
+**private의 필요성**
+
+1. 프로그램의 어느 부분이 변수를 변경할 수 있는지 제어할 수 있다.
+2. 언제든지 내부 표현을 변경할 수 있다.
+
+<br>
+<h3>2.2.2 메서드 헤더</h3>
+
+메서드를 선언할 때는 메서드 이름, 매개변수의 타입과 이름, 반환 타입을 지정해야 한다.
+
+```java
+public void raiseSalary(double byPercent)
+// 위 메서드는 double 타입 매개변수를 한 개 받고, 어떤 값도 반환하지 않는다.
+// getName 메서드는 시그니처(signature(서명))가 다르다.
+
+public String getName()
+// 위 메서드는 매개변수가 없고 String을 반환한다.
+```
+<blockquote>
+
+**Note**
+
+대부분의 메서드는 public(누구든지 메서드 접근 가능)으로 선언하고, 때로 헬퍼 메서드를 private(같은 클래스에 속한 다른 메서드만 접근 가능)으로 선언한다.
 </blockquote>
+
+<br>
+
+<h3>2.2.3 메서드 바디</h3>
+
+```java
+public class Employee {
+	private String name;
+	private double salary;
+
+	public void raiseSalary(double byPercent) {
+		double raise = salary * byPercent / 100;
+		salary += raise;
+	}
+	// 메서드 바디 작성.
+
+	public String getName() {
+		return name;
+	}
+	// 반환값은 return 사용.
+}
+// 메서드 선언은 클래스 선언 안에 들어가야 함.
+```
+
+<br>
+
+<h3>2.2.4 인스턴스 메서드 호출</h3>
+
+```java
+fred.raiseSalary(5);
+// 인수 5는 raiseSalary의 매개변수인 byPercent를 초기화하는데 사용된다.
+public void raiseSalary(double byPercent)
+// 위에서 하는 동작은 double byPercent = 5; 이다.
+
+// 이후에 메서드 바디가 실행.
+double raise = salary * byPercent / 100;
+salary += raise;
+// 위에서 salary는 인스턴수 변수로, 
+// 메서드 호출에 사용한 인스턴스(fred)에 적용된다는 점을 알고 있어야 한다.
+```
+
+<blockquote>
+raiseSalary는 인스턴스 메서드(instance method)이고, 이런 메서드는 클래스의 인스턴스에 작동한다. static으로 선언하지 않은 메서드는 모두 인스턴스 메서드이다.
+
+위의 raiseSalary에는 메서드 호출을 받는 객체에 대한 참조, 호출 인수가 전달되고, 메서드 호출을 받는 객체에 대한 참조를 메서드 호출의 수신자(receiver)라고 한다.
+</blockquote>
+
+<br>
+
+<h3>2.2.5 this 참조</h3>
+
+객체의 메서드를 호출할 때, 해당 객체가 this로 설정된다.
+
+```java
+public void raiseSalary(double byPercent) {
+	double raise = this.salary * byPercent / 100;
+	this.salary += raise;
+}
+// 위처럼 하면 raise는 지역번수고, salary는 인스턴스 변수인 사실이 명확해진다.
+
+public void setSalary(double salary) {
+	this.salary = salary;
+}
+// 인스턴스 변수와 지역 변수의 이름이 같을 때, salary처럼 한정하지 않은 이름은 지역 변수를 나타내고,
+// this.salary는 인스턴스 변수를 나타낸다.
+```
+
+원한다면 this를 메서드의 매개변수로도 선언할 수 있지만, 드물게 사용한다.
+
+<br>
+
+<h3>2.2.6 값을 사용한 호출</h3>
+
+메서드에 객체를 전달하면 해당 메서드는 객체 참조의 사본을 얻어 이 참조로 매개변수 객체에 접근하거나 매개변수 객체를 변경할 수 있다.
+
+```java
+public class EvilManager {
+	private Random generator;
+	...
+	public void giveRandomRaise(Employee e) {
+	  double percentage = 10 * generator.nextGaussian();
+		e.raiseSalary(percentage);
+	}
+}
+
+boss.giveRandomRaise(fred);
+// fred를 e 매개변수로 복사한다. 
+// giveRandomRaise 메서드는 두 참조가 공유하는 객체를 변경한다.
+```
+
+<br>
+
+자바에서는 기본 타입 매개변수를 업데이트 하는 메서드를 작성할 수 없다.
+
+```java
+public void increaseRandomly(double x) {
+	double amount = x * generator.nextDouble();
+	x += amount;
+}
+// 위처럼 double 값을 증가시키는 메서드는 의도한 대로 작동되지 않는다.
+
+boss.increaseRandomly(sales);
+// 위처럼 호출하면, sales가 x로 복사된다. 그 후, x를 증가시키지만 sales는 변하지 않는다.
+// 이후 매개변수는 유효 범위를 벗어나고 증가 연산은 효력을 잃는다.
+
+public class EvilManager {
+	...
+	public void replaceWithZombie(Employee e) {
+		e = new Employee("", 0);
+	}
+}
+
+boss.replaceWithZombie(fred);
+// 위처럼 호출하면 참조 fred가 e 변수로 복사된다.
+// 이후 e는 다른 참조로 설정된다. 메서드가 끝날 때, e는 유효 범위를 벗어나고,
+// fred는 어디서도 변경되지 않는다.
+```
