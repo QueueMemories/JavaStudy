@@ -12,7 +12,7 @@
 </div>
 
 ## 😎 스터디원
-
+- [나청송](https://github.com/BlueTree-Na) 
 
 <br>
 
