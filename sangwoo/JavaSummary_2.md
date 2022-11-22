@@ -689,3 +689,282 @@ System.out.println(percentFormatter.format(x));  // 10%를 출력.
 - new NumberFormat(…) 생성자는 NumberFormat을 돌려준다. 하지만 팩토리 메서드는 서브클래스의 객체를 반환할 수 있다.
 
 - 팩토리 메서드를 사용하면 불필요하게 새 객체를 생성하는 대신 공유 객체를 반환할 수도 있다. 예를 들어 Collections.emptyList()를 호출하면 변경할 수 없는 빈 리스트(공유 객체)를 반환한다.
+
+<br><br>
+
+<h2>2.5 패키지</h2>
+
+---
+
+패키지를 사용하면 작업을 조직화하고 다른 사람이 제공한 코드 라이브러리와 분리하기 편하기 때문에, 자바에서는 연관된 클래스들을 한 패키지 안에 넣는다. 
+
+또, 패키지를 사용하는 것은 클래스 이름의 유일성을 보장한다. 프로그래머 두 명이 각각 Element 클래스를 제공하겠다고 할 때, 각각 다른 패키지에 넣게 되면 충돌이 일어나지 않는다.
+
+<br>
+
+<h3>2.5.1 패키지 선언</h3>
+
+---
+
+패키지 이름은 java.util.regex처럼 점(.)으로 구분된 식별자 목록이다.
+
+패키지 이름의 유일함을 보장하기 가장 좋은 방법은 인터넷 도메인 이름을 뒤집어서 사용하는 것이다. 만일 [horstmann.com](http://horstmann.com) 이라는 도메인 이름을 소유하고 있다면 프로젝트에서는 com.horestmann.corejava 라는 패키지 이름을 사용한다.
+
+<br>
+
+<blockquote>
+note.
+
+java.util 과 java.util.regex 패키지는 서로 관련이 없다. 각각 독립된 클래스 묶음이 들어있다. 이를 통해 알 수 있는 점은 자바에서는 패키지가 중첩되지 않는다는 것이다.
+
+</blockquote>
+
+<br>
+
+```java
+package com.horstmann.corejava;
+
+public class Employee {
+	...
+}
+// 이렇게 작성하면 Employee 클래스는 com.horstmann.corejava 패키지에 속하게 되고,
+// 전체 이름은 com.horstMann.corejava.Employee가 된다.
+```
+
+만일 package 문을 작성하지 않으면, 기본 패키지(default package)에 클래스가 추가된다(권장하지 않음).
+
+위의 상황에서 Employee 객체를 사용하는 EmployeeDemo 클래스를 다음과 같이 컴파일 한다고 하자.
+
+```java
+$ javac com/horstmann/corejava/EmployeeDemo.java
+```
+
+컴파일러는 클래스 파일 com/horstmann/corejava/EmployeeDemo.class 와 com/horstmann/corejava/Employee.class 를 만들어내고, 프로그래머는 전체 클래스 이름을 입력하여 이 프로그램을 실행한다.
+
+```java
+$ java com.horstmann.corejava.EmployeeDemo
+```
+<blockquote>
+caution.
+
+소스 파일이 패키지 이름과 일치하는 서브디렉터리에 위치하지 않아도 javac 컴파일러는 클래스 파일을 만들어 내지만, 클래스 파일은 프로그래머가 직접 올바른 위치에 옮겨 주어야 한다.
+</blockquote>
+
+<blockquote>
+tip.
+
+javac를 실행할 때, -d 옵션을 지정하면 좋다. 그러면 소스 트리를 어지럽히지 않고 별도의 디렉터리 안에 클래스 파일을 만든다. 이렇게 만들어진 클래스 파일은 올바른 서브디렉토리 구조를 갖춘다.
+</blockquote>
+
+<br>
+
+<h3>2.5.2 jar 명령</h3>
+
+---
+
+클래스 파일을 파일 시스템에 저장하는 대신에 JAR 파일이라는 아카이브 파일 한 개 이상에 넣을 수도 있다. JDK에 들어있는 jar 유틸리티로 이런 아카이브를 만들 수 있다. jar의 명령줄 옵션은 유닉스 tar 프로그램과 비슷하다.
+
+```java
+/*
+jar --create --verbose --file library.jar com/mycompany/*.class
+
+// 짧은 옵션을 사용.
+jar -c -v -f library.jar com/mycompany/*.class
+
+// tar 형식 옵션을 사용.
+jar cvf library.jar com/mycompany/*.class
+
+// JAR 파일은 보통 라이브러리를 묶는 데 사용한다.
+*/
+```
+
+<blockquote>
+tip.
+
+라이브러리 뿐 아니라 프로그램을 묶는 데도 JAR 파일을 사용할 수 있다.
+</blockquote>
+
+<br>
+
+```java
+/*
+jar -c -f program.jar -e com.mycompany.MainClass com/mycompany/*.class
+
+// JAR 파일을 만들면 다음과 같이 프로그램을 실행한다.
+java -jar program.jar
+*/
+```
+
+<br>
+
+<h3>2.5.4 클래스 패스</h3>
+
+---
+
+프로젝트에서 라이브러리 JAR 파일을 사용할 때는 클래스 패스(class path)를 지정해서 JAR 파일의 위치를 컴파일러와 가상 머신에 알려야 한다.
+
+클래스 패스가 포함할 수 있는 요소
+
+- (패키지 이름과 일치하는 서브디렉터리 안에) 클래스 파일을 담은 디렉터리
+- JAR 파일
+- JAR 파일을 담은 디렉터리
+
+<br>
+
+클래스 패스를 지정하는 예
+
+```java
+java -cp .:../libs/lib1.jar:../libs/lib2.jar com.mycompany.MainClass
+// 이 클래스에는 현재 디렉터리(.)와 ../libs 디렉터리에 들어있는 JAR파일 두 개, 
+// 즉, 요소 세 개가 포함되어 있다.
+// -cp는 --class-path (하위 호환성을 고려해 남긴 -classpath 도 사용 가능)
+```
+<blockquote>
+note.
+
+윈도우에서는 경로를 구분할 때, 위처럼 ‘:’(콜론) 대신 ‘;’(세미콜론) 을 사용한다.
+
+JAR 파일이 많을 때는 모두 한 디렉터리에 넣어 두고, 이들 모두가 포함되도록 와일드 카드(*)를 사용한다.
+</blockquote>
+
+<br>
+
+```java
+java -cp .:../libs/\* com.mycompany.MainClass
+```
+<blockquote>
+caution.
+
+javac 컴파일러는 항상 현재 디렉터리에서 파일을 찾지만, java 프로그램은 ‘.’디렉터리가 클래스 패스에 있을 때만 현재 디렉터리를 찾는다(클래스 패스를 설정하지 않았을 때는 ‘.’ 디렉터리가 default로 설정되어 상관없음). 따라서 클래스 패스를 설정했는데, ‘.’ 디렉터리를 깜빡 잊고 포함하지 않았다면 javac를 통해 오류 없이 컴파일은 되지만, java를 통해 실행은 불가능하다.
+</blockquote>
+
+<br>
+
+클래스 패스는 -cp 옵션으로 보통 설정하지만, CLASSPATH 환경 변수를 사용하여 설정 가능하다.
+
+```java
+$ export CLASSPATH = .:/home/username/project/libs/\*
+// 위는 배시(bash)
+
+> SET CLASSPATH = .;C:\Users\username\project\libs\*
+// 위는 윈도우
+```
+
+<blockquote>
+caution.
+
+CLASSPATH 환경 변수를 전역으로 설정할 수 있다. 하지만 이 전역 설정을 까먹고 자신의 클래스를 찾지 못하게 될 수도 있다.
+</blockquote>
+
+<br>
+
+<h3>2.5.4 패키지 접근</h3>
+
+---
+
+public 은 모든 클래스에서 사용 가능하고, private 는 선언한 클래스 안에서만 사용할 수 있다. 만일 이를 지정하지 않으면, 해당 기능을 같은 패키지에 속한 모든 메서드에서 접근할 수 있게 된다.
+
+<blockquote>
+note.
+
+소스 파일 하나에 여러 클래스를 포함할 수 있지만, 한 개만 public으로 선언할 수 있다. 소스 파일에 공개 클래스가 있을 때는 파일 이름이 공개 클래스 이름과 일치해야 한다.
+</blockquote>
+
+<br>
+
+다음은 java.awt 패키지의 Window 클래스에 발췌한 코드이다.
+
+```java
+public class Window extends Container {
+	String warningString;
+	...
+}
+```
+
+위 코드에서 warningString 변수는 비공개가 아니므로 java.awt에 속한 모든 클래스에서 이 변수에 접근할 수 있다. 하지만 Window 클래스의 메서드 외에는 무엇도 이 변수에 접근하지 않으니 개발자가 private 제어자를 잊은 것이다.
+
+이렇게 패키지가 개방되어 있다면, 보안 문제를 일으킬 수 있다. 어떤 클래스든 적절한 package 문만 넣어 주면 해당 패키지에 추가할 수 있기 때문이다.
+
+이런 문제점의 해결책은 패키지를 모듈에 넣는 것이다 패키지가 모듈 안에 있으면 클래스를 해당 패키지에 추가할 수 없다. 자바 라이브러리의 모든 패키지는 모듈로 그룹화되어 있으므로 클래스를 단순히 java.awt 패키지에 넣는 방법으로 Window.warningString 변수에 접근할 수 없다.
+
+<br>
+
+<h3>2.5.5. 클래스 임포트</h3>
+
+---
+
+import 문을 사용하면 전체 이름을 쓰지 않아도 클래스를 이용할 수 있게 된다.
+
+```java
+import java.util.Random;
+// 이제 코드에서 java.util.Random을 Random으로 사용할 수 있다.
+```
+
+<blockquote>
+note.
+
+임포트 선언은 필수가 아니다. 편의를 위해 사용하는 것이다.
+
+java.util.Random generator = new java.util.Random(); 으로 사용 가능하다.
+
+import 문의 위치는 소스 파일에서 첫 번째 클래스 선언보다는 위에, package 문보다는 아래 두어야 한다.
+</blockquote>
+
+<br>
+
+와일드 카드를 사용하여 패키지에 들어 있는 모든 클래스를 임포트하는게 가능하다.
+
+```java
+import java.util.*;
+// 와일드카드는 오직 클래스만 임포트할 수 있고, 패키지는 임포트 불가능하다.
+```
+
+<br>
+
+여러 패키지를 임포트할 때, 같은 클래스를 가진 패키지가 존재한다면 이름 충돌이 일어날 수 있다.
+
+```java
+import java.util.*;
+import java.sql.*;
+// 둘다 Date 클래스를 가지므로 사용할 Date가 속해 있는 클래스를 지정해야 한다.
+
+import java.util.*;
+import java.sql.*;
+import java.sql.Date; // 이런식으로
+
+// 만일 꼭 둘다 써야 겠다면
+// 적어도 하나에는 전체 이름을 사용해야 한다.
+Date date1 = new Date();
+java.util.Date date2 = new java.util.Date();
+```
+<blockquote>
+note.
+
+import 문은 C/C++ 의 #include 지시문과는 상당히 다르다. #include는 컴파일용 헤더 파일을 소스에 포함한다. import는 파일을 다시 컴파일하게 하지 않는다. C++ 의 using 문처럼 그저 이름을 줄여 주는 것이다.
+</blockquote>
+
+<br>
+
+<h3>2.5.6 정적 임포트</h3>
+
+---
+
+```java
+import static java.lang.Math.*;
+// 정적 메서드와 정적 변수를 임포트하는 import 문 형태.
+
+// 이 지시문을 소스 파일의 위쪽에 추가하면 클래스 이름을 접두어로 붙이지 않고도,
+// Math 클래스의 정적 메서드와 정적 변수를 사용할 수 있다.
+
+r = sqrt(pow(x, 2) + pow(y, 2)); // 즉, Math.sqrt와 Math.pow를 의미한다.
+
+// 원하는 정적 메서드나 정적 변수만 임포트할 수도 있다.
+
+import static java.lang.Math.sqrt;
+import static java.lang.Math.PI;
+```
+<blockquote>
+note.
+
+다수의 정적 메서드를 제공하는 java.util.Comparator와 java.util.stream.Collectors를 사용할 때는 보통 정적 임포트 선언을 한다.
+</blockquote>
