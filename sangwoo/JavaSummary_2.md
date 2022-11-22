@@ -13,6 +13,8 @@
 
 <h2> 2.1 객체 사용</h2>
 
+---
+
 <blockquote>
 시초에는 함수(function)를 호출하는 방식으로 프로그램을 작성했다. 
 <br><br>
@@ -60,7 +62,9 @@ public static void main(String[] args) {
 ```
 <br>
 <h3>2.1.1 접근자 메서드와 변경자 메서드</h3>
-<br>
+
+---
+
 
 **변경자(mutator)** → 호출되는 객체를 변경하는 메서드<br>
 **접근자(accessor)** → 객체를 변경하지 않는 메서드<br>
@@ -79,6 +83,8 @@ friends.set(0, "Na");
 ```
 <br>
 <h3>2.1.2 객체 참조</h3>
+
+---
 
 자바의 변수에는 오직 객체 참조(reference)만 담을 수 있다. 실제 객체는 다른 곳에 있고, 참조는 실젝 객체를 찾아내는 구현체 고유의 방법이다.
 
@@ -101,7 +107,11 @@ null로 메서드를 호출하면 NullPointerException이 일어난다(내부 �
 
 <h2>2.2 클래스 구현</h2>
 
+---
+
 <h3>2.2.1 인스턴스 변수</h3>
+
+---
 
 자바에서는 인스턴스 변수(instance variable)로 객체의 상태를 나타낸다.
 
@@ -117,6 +127,8 @@ public class Employee {
 
 인스턴스 변수는 주로 private로 선언하는데, 이는 같은 클래스에 속한 메서드만 변수에 접근할 수 있도록 하는 것이다. 
 
+<br>
+
 **private의 필요성**
 
 1. 프로그램의 어느 부분이 변수를 변경할 수 있는지 제어할 수 있다.
@@ -124,6 +136,8 @@ public class Employee {
 
 <br>
 <h3>2.2.2 메서드 헤더</h3>
+
+---
 
 메서드를 선언할 때는 메서드 이름, 매개변수의 타입과 이름, 반환 타입을 지정해야 한다.
 
@@ -145,6 +159,8 @@ public String getName()
 <br>
 
 <h3>2.2.3 메서드 바디</h3>
+
+---
 
 ```java
 public class Employee {
@@ -169,6 +185,8 @@ public class Employee {
 
 <h3>2.2.4 인스턴스 메서드 호출</h3>
 
+---
+
 ```java
 fred.raiseSalary(5);
 // 인수 5는 raiseSalary의 매개변수인 byPercent를 초기화하는데 사용된다.
@@ -192,6 +210,8 @@ raiseSalary는 인스턴스 메서드(instance method)이고, 이런 메서드�
 
 <h3>2.2.5 this 참조</h3>
 
+---
+
 객체의 메서드를 호출할 때, 해당 객체가 this로 설정된다.
 
 ```java
@@ -213,6 +233,8 @@ public void setSalary(double salary) {
 <br>
 
 <h3>2.2.6 값을 사용한 호출</h3>
+
+---
 
 메서드에 객체를 전달하면 해당 메서드는 객체 참조의 사본을 얻어 이 참조로 매개변수 객체에 접근하거나 매개변수 객체를 변경할 수 있다.
 
@@ -258,3 +280,223 @@ boss.replaceWithZombie(fred);
 // 이후 e는 다른 참조로 설정된다. 메서드가 끝날 때, e는 유효 범위를 벗어나고,
 // fred는 어디서도 변경되지 않는다.
 ```
+
+<br><br>
+
+<h2>2.3 객체 생성</h2>
+
+---
+
+클래스를 완성하기 위해서는 생성자를 구현해야 한다.
+
+<br>
+
+<h3>2.3.1 생성자 구현</h3>
+
+---
+
+생성자 선언 방법은 메서드 선언 방법과 비슷하다. 하지만 생성자는 이름이 클래스와 같고 반환 타입이 없다.
+
+```java
+public Employee (String name, double salary) {
+	this.name = name;
+	this.salary = salary;
+}
+// 실수로 반환타입(void, int ...) 등을 넣게 되면 메서드를 선언하는게 된다.
+```
+
+<br>
+
+<blockquote>
+note.
+
+이 생성자는 공개(public) 접근이다. 하지만 비공개(private) 생성자 역시 유용하게 쓰인다.
+
+ex) LocalDate 클래스에는 공개 생성자가 없다. 대신 사용자는 now와 of 등의 ‘팩토리 메서드’를 통해 객체를 얻는다. 이런 경우 비공개 생성자를 호출한다.
+
+생성자는 new 연산자를 사용한 시점에서 실행된다.
+
+```java
+new Employee("SangWoo Moon", 500000);
+// 위는 Employee 클래스의 객체를 할당한 후, 생성자 바디를 호출한다.
+// 생성자 바디는 생성자에 전달된 인수로 인스턴스 변수를 초기화한다.
+// new 연산자는 생성된 객체의 참조를 반환하고, 반환받은 참조를 변수에 저장한다.
+
+Employee james = new Employee("SangWoo Moon", 500000);
+// or
+ArrayList<Employee> staff = new ArrayList<>();
+staff.add(new Employee("SangWoo Moon", 500000));
+```
+</blockquote>
+
+<br>
+
+<h3>2.3.2 오버로딩</h3>
+
+---
+
+생성자는 두 가지 이상의 버전으로 제공할 수 있다. 받는 인수의 타입이 다르거나 개수가 다르면 해당 인수에 맞는 호출이 들어왔을 때 동작한다.
+
+```java
+public Employee (String name, double salary) {
+	this.name = name;
+	this.salary = salary;
+}
+
+public Employee (double salary) {
+	this.name = "";
+	this.salary = salary;
+}
+
+Employee james = new Employee("SangWoo Moon", 500000); // 위 생성자를 호출
+Employee anonymous = new Employee(40000);              // 아래 생성자를 호출
+```
+
+이름은 같은데 매개변수가 다른 메서드가 여러 개 있으면 메서드가 오버로드 된 것이다. 메서드보다 생성자를 오버로드 하는 이유는 생성자는 항상 이름이 클래스 이름과 같아야 하기 때문이다.
+
+<br>
+
+<h3>2.3.3 다른 생성자에서 특정 생성자 호출</h3>
+
+---
+
+비슷한 작업을 수행하는 생성자가 여러 개 있다면 코드 중복을 제거하는 것이 좋다. 공통된 초기화 작업은 대체로 생성자 하나에 몰아넣을 수 있다.
+
+또 다른 생성자에서 어느 한 생성자를 호출하기 위해서는, 호출하는 쪽 생성자 바디의 첫 번째 문장으로만 작성하여야 하고, 생성자 이름이 아닌 this를 통해 호출한다.
+
+```java
+public Employee (String name, double salary) {
+	this.name = name;
+	this.salary = salary;
+}
+
+public Employee (double salary) {
+	this("", salary); // Employee(String, double)를 호출한다.
+  // 코드 중복 제거를 위한 다른 생성자 호출 후, 다른 문장을 이어서 작성한다.
+}
+// 여기서의 this는 객체 참조가 아니고, 같은 클래스에 속한 다른 생성자를 호출하는 특수 문법이다.
+```
+
+<br>
+
+<h3>2.3.4 기본 초기화</h3>
+
+---
+
+생성자 안에서 인스턴스 변수를 명시적으로 설정하지 않으면, 자동으로 변수를 기본 값으로 설정한다.
+
+숫자는 0, bool 값은 false, 객체 참조는 null이 기본 값이다.
+
+```java
+public Employee (String name) {
+	this.name = name;
+}
+// Employee 클래스 안에 salary라는 인스턴스가 존재한다면, 
+// salary는 0으로 자동 설정된다.
+
+// 여기서 인스턴수 변수는 지역 변수와 완전히 다르다. 따라서 지역 변수는 항상 명시적으로 초기화해야 한다.
+```
+
+숫자는 0으로 초기화하면 편하지만, 객체는 null로 초기화 할시 오류가 발생할 확률이 높다.
+
+if (e.getName().equals(”SangWoo Moon”))으로 조건을 검사하면 널 포인터 예외가 일어난다.
+
+<br>
+
+<h3>2.3.5 인스턴스 변수 초기화</h3>
+
+---
+
+```java
+public class Employee {
+	private String name = "";
+	...
+}
+// 위와 같은 방식으로 인스턴스를 초기화 할 수 있다.
+// 이 방법 외에 클래스 선언 안에 임의의 초기화 블록(initialization block)을 넣는 방법도 있다.
+
+public class Employee() {
+	private String name = "";
+	private int id;
+	private double salary;
+
+	{  // 초기화 블록
+		Random generator = new Random();
+		id = 1 + generator.nextInt(1_000_000);
+	}
+
+	public Employee (String name, double salary) {
+		...
+	}
+}
+// 초기화 블록은 자주 사용하는 기능은 아니다. 대부분의 개발자는 긴 초기화 코드를 헬퍼 메서드 안에 두고,
+// 생성자에서 헬퍼 메서드를 호출한다.
+```
+
+인스턴스 변수 초기화와 초기화 블록은 클래스 선언에 나타난 순서로 실행하며, 그 다음에 생성자를 실행한다.
+
+<br>
+
+<h3>2.3.6 최종 인스턴스 변수</h3>
+
+---
+
+인스턴스 변수를 최종(final)으로 선언할 수 있다. 최종으로 선언한 변수는 생성자 실행이 끝나기 전에 초기화해야 한다. 초기화한 후에는 해당 변수를 수정할 수 없다.
+
+```java
+public class Employee {
+	private final String name;
+	...
+}
+```
+
+<br>
+<blockquote>
+note.
+
+그렇다면 만일 객체에 final을 쓰게 되면 어떻게 될까.
+
+변경 가능한 객체를 가리키는 참조에 사용하면 final 제어자는 단지 참조 자체가 절대로 변하지 않는다는 사실만 나타낸다. 따라서 객체의 내용을 변경하는 것은 가능하다.
+</blockquote>
+
+<br>
+
+```java
+public class Person {
+	private final ArrayList<Person> friends = new ArrayList<>();
+		// 이 배열 리스트에 요소를 추가하는 것은 가능하다.
+	...
+}
+// 메서드에서 friends가 참조하는 배열 리스트를 변경할 수는 있지만,
+// 다른 객체로는 절대 교체할 수 없다. 특히 이 참조를 null로 설정하는 것은 불가능하다.
+```
+
+<br>
+
+<h3>2.3.7 인수 없는 생성자</h3>
+
+---
+
+인수 없는 생성자는 적절한 기본 값으로 상태를 설정한 객체를 생성한다.
+
+```java
+public Employee () {
+	name = "";
+	salary = 0;
+}
+// 클래스에 생성자가 없으면 자동으로 아무 작업도 하지 않는 인수 없는 생성자를 받는다.
+// 모든 인스턴스 변수는 명시적인 초기화 없이 기본 값(0 or false or null)으로 남는다.
+// 즉, 모든 클래스에는 생성자가 적어도 하나는 존재한다.
+```
+<blockquote>
+note.
+
+클래스에 생성자가 이미 있으면 인수 없는 생성자를 자동으로 받지 않는다. 생성자가 있는데도 인수 없는 생성자가 필요하다면 직접 작성해야 한다.
+</blockquote>
+<blockquote>
+note.
+
+객체 소멸시.
+
+C++로 대표되는 일부 프로그래밍 언어에서는 일반적으로 객체가 소멸될 때 해야 할 작업을 지정한다. 자바에는 가비지 컬렉터가 객체를 회수할 때 해당 객체를 ‘마무리 하는’ 매커니즘이 있지만, 마무리 과정이 예측할 수 없는 시간에 일어나므로 이 매커니즘을 사용하지 말아야 한다.
+</blockquote>
