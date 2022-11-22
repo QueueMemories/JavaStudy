@@ -500,3 +500,192 @@ note.
 
 C++로 대표되는 일부 프로그래밍 언어에서는 일반적으로 객체가 소멸될 때 해야 할 작업을 지정한다. 자바에는 가비지 컬렉터가 객체를 회수할 때 해당 객체를 ‘마무리 하는’ 매커니즘이 있지만, 마무리 과정이 예측할 수 없는 시간에 일어나므로 이 매커니즘을 사용하지 말아야 한다.
 </blockquote>
+
+<br><br>
+
+<h2>2.4 정적 변수와 정적 메서드</h2>
+
+---
+
+static 제어자의 의미를 알아본다.
+
+<br>
+
+<h3>2.4.1 정적 변수</h3>
+
+---
+
+클래스 안에 변수를 static 으로 선언하면 해당 변수는 클래스당 하나만 존재한다. 반면 각 객체에는 자체적인 인스턴스 변수의 사본이 들어 있다.
+
+```java
+public class Employee {
+	private static int lastId = 0;
+	private int id;
+	...
+	public Employee () {
+		lastId++;
+		id = lastId;
+	}
+}
+// 모든 Employee 객체는 인스턴스 변수인 id를 각자 보유한다. 하지만 lastId 변수는 오직 하나이다.
+// lastId 변수는 클래스의 특정 인스턴스가 아니라 클래스 자체에 속한다.
+
+// 새 Employee 객체를 생성하면 공유된 lastId 변수가 증가하고, 
+// 인스턴스 변수 id가 증가한 값으로 설정된다. 즉, 모든 직원 객체가 유일한 id 값을 얻는다.
+```
+
+<br>
+<blockquote>
+caution.
+
+여러 스레드가 Employee 객체를 동시에 생성하면 이 코드는 제대로 작동하지 않는다.
+</blockquote>
+
+<br>
+<blockquote>
+note. 
+
+그렇다면 왜 개별 인스턴스가 아닌 클래스에 속하는 변수를 ‘정적(static)’ 이라고 하는가.
+
+단지 c++에서 유래한 의미 없는 유물이다. 의미를 더 적절하게 드러내는 용어는 ‘클래스 변수’이다.
+</blockquote>
+
+<br>
+
+<h3>2.4.2 정적 상수</h3>
+
+---
+
+변경 가능한 정적 변수는 드물지만, 정적 상수(static final 변수)는 아주 일반적이다. 예를 들어 Math 클래스는 다음 정적 상수를 선언하고, 프로그램에서는 이 상수를 Math.PI로 접근한다.
+
+```java
+public class Math {
+	...
+	public static final double PI = 3.14159265358979323846;
+	...
+}
+// static 키워드가 없는 PI는 Math 클래스의 인스턴스 변수가 된다. 
+// 즉 PI에 접근하려면 Math 클래스의 객체가 필요하고, 
+// 모든 Math 객체는 자체적으로 PI의 사본을 가지고 있어야 한다.
+
+public class Employee {
+	private static final Random generator = new Random();
+	private int id;
+	...
+	public Employee() {
+		id = 1 + generator.nextInt(1_000_000);
+	}
+}
+// 위는 숫자가 아니라 객체를 담는 정적 final 변수의 예이다.
+// 난수가 발생할 때마다 새 난수 발생기를 사용하지 않고, 
+// 클래스의 모든 인스턴스에서 난수 발생기를 하나 공유하는 방법을 사용한다.
+
+public class System {
+	public static final PrintStream out;
+	...
+}
+// System.out은 System 클래스에 위처럼 선언되어 있다.
+```
+
+ <br>
+ 
+ <h3>2.4.3 정적 초기화 블록</h3>
+
+ ---
+
+앞에서는 정적 변수를 선언하면서 초기화했다. 하지만 초기화 작업이 추가로 필요한 경우가 있는데, 이 때는 정적 초기화 블록(static initialization block) 안에 넣으면 된다.
+
+```java
+public class CreditCardForm {
+	private static final ArrayList<Integer> expirationYear = new ArrayList<>();
+	static {
+		// 다음 20개 년도를 배열 리스트에 추가한다.
+		int year = LocalDate.now().getYear();
+		for (int i = year; i <= year + 20; i++) {
+			expirationYear.add(i);
+		}
+	}
+	...
+}
+// 정적 초기화는 클래스를 처음 로드할 때 일어난다. 
+// 정적 변수를 명시적으로 다른 값으로 설정하지 않으면 0이나 false 또는 null이 된다.
+// 모든 정적 변수 초기화와 정적 초기화 블록은 클래스 선언 안에 나타난 순서로 실행된다.
+```
+
+<br>
+<blockquote>
+약주.
+
+네이티브 메서드란 ?
+
+자바에서 구현하지 않는 메서드이고, 자바 언어의 접근 제어 메커니즘을 우회할 수 있다.
+
+JNI(Java Natice Interface)를 사용해서 만든 메서드이다. JNI는 자바 가상 머신을 구동하는 ‘네이티브’ 운영체제에서 제공하는 API에 접근하는 메커니즘이다. 네이티브 메서드는 C/C++ 언어로 작성한다. 주로 특정 운영체제의 고유의 API를 활용하거나 기존 C/C++ 기본 모듈을 자바 프로그램과 연동하려고 사용한다. 이외에도 빠른 계산이 필요한 수학 라이브러리 등에서 사용한다. 하지만 JNI를 사용하면 자바의 이식성이 떨어질 수 있고, 잘못 작성하면 오히려 순수 자바로 작성한 프로그램보다 느릴 수 있으므로 필요한 경우에만 활용하는 것이 좋다.
+</blockquote>
+
+<br>
+
+<h3>2.4.4 정적 메서드</h3>
+
+---
+
+정적 베서드는 객체에 작동하지 않는 메서드이다. ex) Math.pow(x, a)
+
+위 메서드는 작업을 수행할 때 Math 객체를 전혀 사용하지 않고, static 제어자로 선언한다.
+
+```java
+public class Math {
+	public static double pow(double base, double exponent) {
+		...
+	}
+}
+// pow를 인스턴스 메서드로 만들지 않는 이유.
+// 자바에서 기본 타입은 클래스가 아니므로 double의 인스턴스 메서드가 될 수 없다.
+// Math 클래스의 인스턴스 메서드로 만들 수도 있지만, 
+// 그렇다면 pow 메서드를 호출하기 위해 Math 객체를 매번 생성해야 했을 것이다.
+
+// 다른 사람이 만든 클래스에 부가 기능을 제공할 수도 있다..
+
+```
+
+<br>
+<blockquote>
+note.
+
+객체로도 정적 메서드 호출이 가능하다. 하지만 아무 의미 없는 방법이다.
+
+정적 메소드는 객체에 작동하지 않으므로 인스턴스 변수에 접근할 수 없다. 대신 자신이 속한 클래스의 정적 변수에 접근할 수 있다.
+
+```java
+public static RandomNumbers {
+	private static Random generator = new Random();
+	public static int nextInt(int low, int high) {
+		return low + generator.nextInt(high - low + 1);
+			// 정적 변수 generator 에 접근할 수 있다.
+	}
+}
+```
+</blockquote>
+
+<br>
+
+<h3>2.4.5 팩토리 메서드 </h3>
+
+---
+
+정적 메서드는 팩토리 메서드를 만드는데 사용한다. 펙터리 메서드(factory method)는 클래스의 새 인스턴스를 반환하는 정적 메서드를 의미한다.
+
+```java
+NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+NumberFormat percentFormatter = NumberFormat.getPercentInstance();
+double x = 0.1;
+System.out.println(currencyFormatter.format(x)); // $0.10을 출력.
+System.out.println(percentFormatter.format(x));  // 10%를 출력.
+```
+
+
+- 생성자를 구별하는 유일한 방법은 생성자의 매개변수 타입이기에 매개변수가 없는 생성자를 두개씩 둘 수 없다. 따라서 위에서는 생성자 대신 팩토리 메서드를 사용했다.
+
+- new NumberFormat(…) 생성자는 NumberFormat을 돌려준다. 하지만 팩토리 메서드는 서브클래스의 객체를 반환할 수 있다.
+
+- 팩토리 메서드를 사용하면 불필요하게 새 객체를 생성하는 대신 공유 객체를 반환할 수도 있다. 예를 들어 Collections.emptyList()를 호출하면 변경할 수 없는 빈 리스트(공유 객체)를 반환한다.
