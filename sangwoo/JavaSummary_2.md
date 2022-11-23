@@ -968,3 +968,238 @@ note.
 
 다수의 정적 메서드를 제공하는 java.util.Comparator와 java.util.stream.Collectors를 사용할 때는 보통 정적 임포트 선언을 한다.
 </blockquote>
+
+<br><br>
+
+<h2>2.6 중첩 클래스</h2>
+
+---
+
+앞서 알아본 클래스를 패키지로 구조화하는 방법 이외에 클래스를 다른 클래스 내부에 두는 방법이 있다. 이런 클래스를 중첩 클래스(nested class)라고 한다. 중첩 클래스는 가시성을 제한하거나 Element, Node, Item처럼 일반적인 이름을 쓰면서도 정돈된 상태를 유지할 때 유용하다.
+
+<br>
+
+<h3>2.6.1 정적 중첩 클래스</h3>
+
+---
+
+물품(item)의 비용을 청구하는 Invoice 클래스가 있다. 각 물품에는 설명, 수량, 단가가 포함되어 있다. 
+
+```java
+public class Invoice {
+	private static class Item {  // Invoice안에 Item을 중첩했다.
+		String description;
+		int quantity;
+		double unitPrice;
+
+		double price() { return quantity * unitPrice; }
+	}
+	
+	private ArrayList<Item> items = new ArrayList<>();
+	...
+}
+```
+
+위 Item 클래스는 Invoice 안에 비공개로 선언해서 오직 Invoice의 메서드에서만 접근할 수 있다. 따라서 여기서 이 내부 클래스의 인스턴스 변수를 굳이 비공개로 만들지 않아도 됐다.
+
+<br>
+
+```java
+public class Invoice {
+	...
+	public void addItem(String description, int quantity, double unitPrice) {
+		Item newItem = new Item();
+		newItem.description = description;
+		newItem.quantity = quantity;
+		newItem.unitPrice = unitPrice;
+		items.add(newItem);
+	}
+}
+// 내부 클래스의 객체를 생성하는 메서드이다.
+// 중첩 클래스인 Item을 static으로 선언하여 Invoice 내부 메서드에서만 접근 가능하게 하고,
+// addItem을 통해 Item 객체를 생성후 인자로 받은 값을 인스턴스 값으로 넣어주고,
+// private를 통해 선언한 배열 리스트 items에 넣어줌으로써, 
+// 객체 생성을 addItem 메소드에 인자를 넘겨주는 방법으로만 할 수 있게 설계한 것이다.
+```
+
+클래스는 중첩 클래스를 공개로도 만들 수 있다. 공개로 만들 때는 일반적인 캡슐화 매커니즘을 사용한다.
+
+<br>
+
+```java
+public class Invoice {
+	public static class Item {  // 공개 중첩 클래스
+		private String description;
+		private int quantity;
+		private double unitPrice;
+
+		public Item(String description, int quantity, double unitPrice) {
+			this.description = description;
+			this.quantity = quantity;
+			this.unitPrice = unitPrice;
+		}
+
+		public double price() { return quantity * unitPrice; }
+		...
+	}
+	
+	private ArrayList<Item> items = new ArrayList<>();
+
+	public void add(Item item) { items.add(item); }
+	...
+}
+```
+
+이제 어디서든 한정된 이름 Invoice.Item을 통해 Item 객체를 생성할 수 있다.
+
+```java
+Invoice myInvoice = new Invoice();
+Invoice.Item newItem = new Invoice.Item("moon", 2, 19.95);
+myInvoice.add(newItem);
+```
+
+Invoice.Item 클래스와 다른 클래스 외부에 선언한 InvoiceItem 클래스는 근본적으로 차이가 없다. 클래스 중첩은 그저 Item 클래스가 청구서에 들어 있는 물품을 표현한다는 사실을 분명하게 한다.
+
+<br>
+
+<h3>2.6.2 내부 클래스</h3>
+
+---
+
+static 을 붙이지 않은 클래스를 내부 클래스(이너 클래스(inner class))라고 한다.
+
+각 회원(member)이 다른 회원과 관계를 맺는 소셜 네트워크를 생각해 보자.
+
+```java
+public class Network {
+	public class Mumber {
+		private String name;
+		private ArrayList<Mumber> friends;
+
+		public Member(String name) {
+			this.name = name;
+			friends = new ArrayList<>();
+		}
+		...
+	}
+	
+	private ArrayList<Merber> members = new ArrayList<>();
+	...
+}
+// static 제어자를 빼면 근본적인 차이가 생긴다.
+// 위 코드에서 Member 객체는 자신이 어느 네트워크에 속하는지 알게 된다.
+
+// 회원을 네트워크에 추가하는 메서드를 작성해보자.
+public class Network {
+	...
+	public Member enroll(String name) {
+		Member newMember = new Member(name);
+		members.add(newMember);
+		return newMember;
+	}
+}
+
+// 아래 코드를 통해 회원을 추가하고 참조를 얻을 수 있다.
+Network myFace = new Network();  // 외부 클래스 생성. (members를 가짐)
+Network.Member fred = myFace.enroll("Fred");  
+// 내부 클래스에 존재하는 생성자로 fred를 생성. 
+// private String name;
+// private ArrayList<Mumber> friends; (생성됨 이 두개가)
+// myFace(외부 클래스 객체)에서 내부 메소드인 enroll에 접근하여 members에 "Fred"를 추가.
+
+// 멤버십 해지를 위한 메서드
+public class Network {
+	public class Member {
+		...
+		public void deactivate() {
+			members.remove(this); 
+			// == Network.this.members.romove(this);
+			// 내부 클래스의 각 객체는 외부 클래스의 객체에 대한 참조를 포함한다.
+		}
+	}
+
+	private ArrayList<Member> members;
+	...
+}
+
+// 내부 클래스의 메서드는 외부 클래스(아우터 클래스(outer class))의 인스턴스 변수에 접근할 수 있다.
+// 위 코드에서는 내부 클래스를 생성한 외부 클래스 객체의 인스턴스 변수 members이다.
+
+fred.deactivate();
+// 위 코드로 fred의 "Fred" 를 해지한다.
+```
+
+즉, 정적 중첩 클래스에는 참조가 없다(정적 메서드에 this 참조가 없는 것과 마찬가지). 중첩 클래스의 인스턴스가 자신을 감싸고 있는 클래스의 어느 인스턴스에 속하는지 알 필요가 없을 때, 정적 중첩 클래스를 사용하자(내부 클래스는 이 정보가 중요할 때 사용).
+
+<br>
+
+```java
+public class Network {
+	public class Member {
+		...
+		public void deactivate() {
+			unenroll(this);
+			// == outer.unenroll(this);
+		}
+	}
+
+	private ArrayList<Member> members;
+
+	public Member enroll(String name) { ... }
+	public void unenroll(Member m) { ... } // 회원 탈퇴를 위한 메소드 (외부 클래스에 존재)
+	...
+}
+```
+
+<br>
+
+<h3>2.6.3 내부 클래스용 특수 문법 규칙</h3>
+
+---
+
+외부 클래스 참조를 나타나내는 실제 문법은 복잡하다. OuterClass.this 이 표현식은 외부 클래스 참조를 나타낸다.
+
+```java
+public void deactivate() {
+	Network.this.members.remove(this);
+}
+// 사실 members.remove(this)만 작성해도 암묵적으로 외부 클래스 참조를 사용한다.
+// 하지만, 명시적으로 외부 클래스 참조가 필요한 경우에는 위처럼 작성한다.
+
+public class Network {
+	public class Member {
+		...
+		public boolean belongsTo(Network n) {
+			return Network.this == n;
+		}
+	}
+}
+// 위 코드는 Member 객체가 특정 네트워크에 속하는지 검사하는 메서드이다.
+```
+
+<br>
+
+내부 클래스 객체를 생성할 때 해당 객체는 자신을 생성한 외부 클래스 객체를 기억한다.
+
+```java
+public class Network {
+	...
+	Member enroll(String name) {
+		Member newMember = new Member(name);
+		...
+	}
+}
+// 위 코드는 Member newMember = this.new Member(name); 의 축약 형이다.
+
+// 외부 클래스의 어느 인스턴스로도 내부 클래스 생성자를 호출할 수 있다.
+Network.Member wilma = myFace.new Member("Moon");
+```
+
+<blockquote>
+
+note.
+
+내부 클래스에는 컴파일 시간 상수 외에 정적 멤버를 선언할 수 없다. 
+
+내부 클래스는 자신을 감싸고 있는 인스턴스를 참조하는 숨은 인스턴스 변수를 멤버로 가진 일반 클래스로 변환된다.
+</blockquote>
