@@ -12,7 +12,9 @@
 </div>
 
 ## 😎 스터디원
-- [나청송](https://github.com/BlueTree-Na) 
+- [😎 문상우](https://github.com/Msangwool) 
+- [😎 나청송](https://github.com/BlueTree-Na) 
+- [😎 김우원](https://github.com/Hamul777) 
 
 <br>
 
