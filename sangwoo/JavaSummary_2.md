@@ -1203,3 +1203,166 @@ note.
 
 내부 클래스는 자신을 감싸고 있는 인스턴스를 참조하는 숨은 인스턴스 변수를 멤버로 가진 일반 클래스로 변환된다.
 </blockquote>
+
+<br><br>
+
+<h2>2.7 문자화 주석javadoc</h2>
+
+---
+
+JDK에는 javado 도구가 존재한다. 이 도구는 소스 파일로 HTML 문서를 만든다. 소스 코드에 구분자 /** 로 시작하는 주석을 추가하면 온라인 API 문서처럼 전문가 수준의 문서를 손쉽게 만들 수 있다. 이를 통해 문서화 주석을 소스 코드와 같은 파일에 넣고, 코드와 주석을 업데이트 했을 때는 javadoc을 다시 실행시키만 하면 된다.
+
+<br>
+
+<h3>2.7.1 주석 넣기</h3>
+
+---
+
+javadoc 유틸리티는 다음 정보를 추출한다.
+
+- 공개 클래스와 인터페이스
+- 공개 , 보호 생성자와 메서드
+- 공개, 보호 변수
+- 패키지와 모듈
+
+주석은 설명할  기능 바로 위에 붙인다. 주석은 /**로 시작하고 */로 마친다. 이 안에서는 자유 형식 텍스트와 그 뒤에 태그들을 적는다. (태그는 @로 시작함)
+
+<br>
+
+javadoc 유틸리티는 요약문들을 추출해서 자동으로 요약 페이지를 만들기 때문에, 자유 형식 텍스트의 첫 번째 문장은 요약문이여야 한다. 이곳에는 HHTML문법이 사용 가능하다.
+<blockquote>
+
+note. 
+
+주석에 이미지 링크가 들어갈 때, 소프 파일 디렉터리에 doc-files라는 서브디렉터리를 만들어 여기에 이미지 파일을 넣으면 된다. 이 때, javadoc 유틸리티는 doc-files 디렉터리와 그 안에 있는 파일을 소스 디렉터리에서 문서 디렉터리로 복사한다. ex) <img src=”doc-files/uml.png” alt=”UML diagram” /> 
+</blockquote>
+
+<br>
+
+<h3>2.7.2 클래스 주석</h3>
+
+---
+
+클래스 주석은 반드시 클래스 선언 바로 앞에 붙여야 한다. @author와 @version 태그로 저자와 버전을 문서화 할 수 있다.
+
+```java
+/**
+ * <code>Invoice</code> 객체는 각 주문 항목에 해당하는
+ * 품목을 나열한 청구서를 표현한다.
+ * @author 프레드 프린스톤
+ * @author 바니 러블
+ * @version 1.1
+*/
+public class Invoice {
+	...
+
+```
+
+<br>
+
+<h3>2.7.3 메서드 주석</h3>
+
+---
+
+각 메서드 주석은 메서드 바로 앞에 붙인다. 메서드 주석에는 다음 기능을 문서화한다.
+
+- 각 매개변수 : @param variable description
+- void 가 아닌 반환 값 : @return description
+- 메서드에서 던지는 예외 : @throws ExceptionClass description
+
+```java
+/**
+ * 직원의 급여를 인상한다.
+ * @param byPercent 급여 인상 백분율(10은 10%를 의미)
+ * @return 인상액
+*/
+public double raiseSalary(double byPercent) {
+	double raise = salary * byPercent / 100;
+	salary += raise;
+	return raise;
+}
+```
+
+<br>
+
+<h3>2.7.4 변수 주석</h3>
+
+---
+
+공개 변수(정적 상수를 의미)만 문서화하면 된다.
+
+```java
+/**
+ * 연간 일 수(윤년 제외)
+*/
+public static final int DAYS_PER_YEAR = 365;
+```
+
+<br>
+
+<h3>2.7.5 일반 주석</h3>
+
+---
+
+모든 문서화 주석에 @since 태그로 해당 기능을 도입한 버전을 적을 수 있다.
+
+@since version 1.7.1 — 이런식으로
+
+@deprecated 태그에는 해당 클래스, 메서드, 변수를 사용하지 말아야 한다는 주석을 추가한다.
+
+설명에는 대체 방법을 제안해야 한다.
+
+@deprecated Use <code>setVisible(true)</code> instead
+
+<br>
+
+<h3>2.7.6 링크</h3>
+
+---
+
+@see 와 @link 태그로 자바독 문서의 관련 부분이나 외부 문서에 하이퍼링크를 추가할 수 있다.
+
+@see reference 로 작성하고 reference에는 다음이 올 수 있다.
+
+- package.Class#feature label
+- <a href=”…”>label</a>
+- “text”
+
+기능 하나에 @see 태그를 여러 개 추가할 수 있지만, 이때는 @see 태그들을 반드시 함께 두어야 한다.
+
+원한다면 모든 문서화 주석의 어느 위치든 다른 클래스나 메서드의 하이퍼링크를 넣을 수 있다. 주석의 어느 위치에서든 다음 형식으로 된 태그를 삽입하면 된다.
+
+{@link package.Class#feature label}
+
+<br>
+
+<h3>2.7.7 패키지 주석, 모듈 주석, 개요 주석</h3>
+
+---
+
+패키지 주석을 만들기 위해서는 각 패키지 디렉터리에 파일을 따로 추가해야 한다.
+
+패키지 디렉터리에 자바 파일 package-info.java를 추가한다. 이 파일의 첫 부분에는 /** 와 */ 로 구분한 자바독 주석이 있어야 하고, 그 뒤에는 패키지 문이 있어야 한다.
+
+모듈을 문서화하려면 [module-info.java](http://module-info.java) 파일에 주석을 넣어야 한다. @moduleGraph 지시문을 사용하면 모듈 의존성 그래프를 넣을 수 있다.
+
+<br>
+
+<h3>2.7.8 주석 내보내기</h3>
+
+---
+
+docDirectory는 HTML 파일을 내보낼 디렉토리 이름을 나타낸다. HTML 파일을 보낼 때는 다음 단계를 따른다.
+
+1. 문서화하려는 소스 파일이 있는 디렉토리로 이동한다. com.horstmann.corejava 처럼 문서화하려는 패키지가 중첩되어 있을 때는 com을 서브 디렉터리로 포함하는 디렉터리에서 작업해야 한다.
+2. $ javadoc -d docDirectory package1 package2 …  (이 명령어를 실행함)
+    
+    -d docDirectory 옵션을 생략하면 HTML 파일이 현재 디렉터리에 추출된다. (권장 x)
+    
+
+-link 옵션을 사용하면 표준 클래스에 하이퍼링크를 넣을 수 있다.
+
+
+ex) $ javadoc -link [http://docs.oracle.com/javase/9/docs/api*.java](http://docs.oracle.com/javase/9/docs/api*.java) (oracle에 존재하는 웹 문서 하이퍼링크)
+
+-linksource 옵션을 사용하면 각 소스 파일을 HTML로 변환하고, 클래스와 메서드 이름이 소스를 가리키는 하이퍼링크로 바뀐다.
