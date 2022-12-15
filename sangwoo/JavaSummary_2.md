@@ -629,7 +629,7 @@ JNI(Java Natice Interface)를 사용해서 만든 메서드이다. JNI는 자바
 
 ---
 
-정적 베서드는 객체에 작동하지 않는 메서드이다. ex) Math.pow(x, a)
+정적 메서드는 객체에 작동하지 않는 메서드이다. ex) Math.pow(x, a)
 
 위 메서드는 작업을 수행할 때 Math 객체를 전혀 사용하지 않고, static 제어자로 선언한다.
 
@@ -1058,7 +1058,7 @@ Invoice.Item newItem = new Invoice.Item("moon", 2, 19.95);
 myInvoice.add(newItem);
 ```
 
-Invoice.Item 클래스와 다른 클래스 외부에 선언한 InvoiceItem 클래스는 근본적으로 차이가 없다. 클래스 중첩은 그저 Item 클래스가 청구서에 들어 있는 물품을 표현한다는 사실을 분명하게 한다.
+Invoice.Item 클래스와 다른 클래스 외부에 선언한 Invoice.Item 클래스는 근본적으로 차이가 없다. 클래스 중첩은 그저 Item 클래스가 청구서에 들어 있는 물품을 표현한다는 사실을 분명하게 한다.
 
 <br>
 
@@ -1072,9 +1072,9 @@ static 을 붙이지 않은 클래스를 내부 클래스(이너 클래스(inner
 
 ```java
 public class Network {
-	public class Mumber {
+	public class Member {
 		private String name;
-		private ArrayList<Mumber> friends;
+		private ArrayList<Member> friends;
 
 		public Member(String name) {
 			this.name = name;
@@ -1104,7 +1104,7 @@ Network myFace = new Network();  // 외부 클래스 생성. (members를 가짐)
 Network.Member fred = myFace.enroll("Fred");  
 // 내부 클래스에 존재하는 생성자로 fred를 생성. 
 // private String name;
-// private ArrayList<Mumber> friends; (생성됨 이 두개가)
+// private ArrayList<Member> friends; (생성됨 이 두개가)
 // myFace(외부 클래스 객체)에서 내부 메소드인 enroll에 접근하여 members에 "Fred"를 추가.
 
 // 멤버십 해지를 위한 메서드
@@ -1229,7 +1229,7 @@ javadoc 유틸리티는 다음 정보를 추출한다.
 
 <br>
 
-javadoc 유틸리티는 요약문들을 추출해서 자동으로 요약 페이지를 만들기 때문에, 자유 형식 텍스트의 첫 번째 문장은 요약문이여야 한다. 이곳에는 HHTML문법이 사용 가능하다.
+javadoc 유틸리티는 요약문들을 추출해서 자동으로 요약 페이지를 만들기 때문에, 자유 형식 텍스트의 첫 번째 문장은 요약문이여야 한다. 이곳에는 HTML문법이 사용 가능하다.
 <blockquote>
 
 note. 
