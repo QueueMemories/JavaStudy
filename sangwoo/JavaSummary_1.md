@@ -22,13 +22,13 @@
     ---
     자바의 특징
     <blockquote>
-    자바의 가장 큰 특징은 객체 지향 언어라는 것이다. 따라서 프로그램에서 객체(Object)를 조작해 일을 킨다. 각 객체는 특정 클래스(Class)에 속하며, 그 객체를 클래스의 인스턴스(Instance)라고 한다. 클래스의 객체 상태와 할 수 있는 일을 정의하며 자바는 모든 코드를 클래스 안에서 정의한다. 위 코드를 보면 main 함수가 HelloWorld라는 클래스 안에서 정의되고 실행되는 것을 볼 수 있다.
+    자바의 가장 큰 특징은 객체 지향 언어라는 것이다. 따라서 프로그램에서 객체(Object)를 조작해 일을 시킨다. 각 객체는 특정 클래스(Class)에 속하며, 그 객체를 클래스의 인스턴스(Instance)라고 한다. 클래스의 객체 상태와 할 수 있는 일을 정의하며 자바는 모든 코드를 클래스 안에서 정의한다. 위 코드를 보면 main 함수가 HelloWorld라는 클래스 안에서 정의되고 실행되는 것을 볼 수 있다.
     </blockquote>
     <br>
     main Method
     <blockquote>
     main 함수는 메서드(Method)이다(== 클래스 안에서 선언된 함수). main 메서드는 프로그램을 실행할 때, 첫 번째로 호출하는 메서드이다. 이 메서드는 객체가 없어도 작동하도록 static 으로 선언한다. 여기서 main이 호출될 시엔는 미리 정의된 소수의 객체만 존재하며 이 중 어느것도 HelloWorld 클래스의 인스턴스가 아니다. void는 값을 반환하지 않는다는 뜻이다.<br><br>
-    main 메서드의 바디를 살펴보자. ex) System.out.println은 System.out으로 메시지를 표시하는 명령 한 줄로 구성된다. System.out은 자바 프로글매에서 ‘표준 출력(Standard output)’을 나타내는 객체이다.
+    main 메서드의 바디를 살펴보자. ex) System.out.println은 System.out으로 메시지를 표시하는 명령 한 줄로 구성된다. System.out은 자바 프로그램에서 ‘표준 출력(Standard output)’을 나타내는 객체이다.
     </blockquote>
     <br>
     public, private
@@ -150,7 +150,7 @@
 
     ---
     <blockquote>
-    Integer.MIN_VAlUE 상수는 가장 작은 정수 값, Integer.MAX_VALUE는 가장 큰 정수 값을 나타낸다. Long, Short, Byte 클래스에도 MIN_VALUE와 MIN_VALUE 상수가 있다.
+    Integer.MIN_VAlUE 상수는 가장 작은 정수 값, Integer.MAX_VALUE는 가장 큰 정수 값을 나타낸다. Long, Short, Byte 클래스에도 MIN_VALUE와 MAX_VALUE 상수가 있다.
     <br>if) long 타입보다 큰 수가 있을 때는, BigInteger 클래스를 사용하여 처리한다.
     </blockquote>
     <br>
@@ -164,7 +164,7 @@
     long 정수 리터럴은 접미어 L을 붙여서 작성한다(400L). byte나 short 타입 리터럴을 작성하는 문법은 없다. 따라서 캐스트 표기법을 사용한다.
     16진수는 0x를 붙여 작성. 2진수는 0b를 붙여서 작성한다.
     8진수는 0 을 붙여 사용한다. 011 은 9 이렇게 하지만 이런 형태는 혼동을 줄 수도 있으니 가급적 사용하지 않는게 좋다.
-    숫자 리터럴은 밑줄()을 붙일 수 있다. 백만은 1_000_000 또는 0b1111_0100_0010_0100_0000 이렇게 나타낼 수 있다.
+    숫자 리터럴은 밑줄(_)을 붙일 수 있다. 백만은 1_000_000 또는 0b1111_0100_0010_0100_0000 이렇게 나타낼 수 있다.
     </blockquote>
     <br><br>
     <h3>1.2.2 부동소수점 타입</h3>
@@ -207,7 +207,7 @@
     부동 소수점 수는 금융 계산에는 적합하지 않다. 금융 계산은 반올림 오류를 용납하지 않기 때문이다.
 
     ```java
-    System.out.println(2.0 - 1.1)
+    System.out.println(2.0 - 1.1);
     // 0.8999999999999999
     ```
     <blockquote>
@@ -259,7 +259,7 @@
 
     // 타입이 같은 변수 여러 개를 한 문장으로 선언 가능.
 
-    int total = 0, count
+    int total = 0, count;
 
     // 여기서 count는 초기화되지 않은 정수이다.
 
@@ -273,7 +273,7 @@
 
     ---
     - 변수 이름은 반드시 문자로 시작. (메서드와 클래스도 동일)<br>
-    - 변수 이름은 문자, 숫자, 기호 _와 \$로 구성 가능, 하지만 \$는 자동으로 생성되는 이름이기에 직접 이름을 지을 때는 사용하지 않음. 자바 9부터는 _자체는 명령어로 등록되어 단독 사용시에 오류 발생. <br>
+    - 변수 이름은 문자, 숫자, 기호 _와 $로 구성 가능, 하지만 $는 자동으로 생성되는 이름이기에 직접 이름을 지을 때는 사용하지 않음. 자바 9부터는 _자체는 명령어로 등록되어 단독 사용시에 오류 발생. <br>
     - 문자와 숫자는 라틴 알파벳에 한정되지 않아 모든 알파벳으로 구성 가능. 또한, 자바는 대, 소문자를 구분하기에 count와 Count는 다른 이름으로 인식됨. 이름에는 공백과 기호가 사용 불가하고, double처럼 예약어(명령어)도 사용이 불가능.<br>
     - 일반적으로 변수와 메서드의 이름은 소문자로 시작, 클래스 이름은 대문자로 시작. 자바 프로그래머는  낙타 표기법을 선호하며 그 정의는 countOfInvalidInputs처럼  여러 단어로 구성되어 있을 때, 각 단어의 첫 글자를 대문자로 쓰는 것을 의미함.
 
@@ -444,10 +444,10 @@
     ---
 
     ```java
-    Math.pow(x, y) // x를 y번만큼 곱함(제곱 연산).
-    Math.sqrt(x)   // x의 제곱수를 구함.
-    Math.max(x, y) // 두 값의 최댓값을 구함.
-    Math.min(x, y) // 두 값의 최솟값을 구함.
+    Math.pow(x, y); // x를 y번만큼 곱함(제곱 연산).
+    Math.sqrt(x);   // x의 제곱수를 구함.
+    Math.max(x, y); // 두 값의 최댓값을 구함.
+    Math.min(x, y); // 두 값의 최솟값을 구함.
 
     int value = 1000000000 * 3;
     System.out.println(value);
@@ -458,13 +458,13 @@
     // Exception in thread "main" java.lang.ArithmeticException: integer overflow
 
     // 이상한 값 대신 에러처리 가능.
-    Math.addExact(x, y)        // 덧셈.
-    Math.subtractExact(x, y)   // 뺄셈.
-    Math.multiplyExact(x, y)   // 곱셈.
-    Math.incrementExact(x)     // 1을 추가.
-    Math.decrementExact(x)     // -1을 추가.
-    Math.negateExact(x)        // 부호 변경.
-    Math.toIntExact(x)         // long -> int 변경.
+    Math.addExact(x, y);        // 덧셈.
+    Math.subtractExact(x, y);   // 뺄셈.
+    Math.multiplyExact(x, y);   // 곱셈.
+    Math.incrementExact(x);     // 1을 추가.
+    Math.decrementExact(x);     // -1을 추가.
+    Math.negateExact(x);        // 부호 변경.
+    Math.toIntExact(x);         // long -> int 변경.
     // 이는 모두 int와 long 매개변수 버전을 제공한다.
 
     // -- example --
@@ -512,7 +512,7 @@
 
     ```java
     int n = 1;
-    char next = (char)('J'+n) 
+    char next = (char)('J'+n) ;
     // 1. char 타입과 int 타입이므로 둘다 int타입으로 변환되어 계산
     // 2. 계산된 75를 char타입으로 변환 == 'K'
     ```
@@ -1144,7 +1144,7 @@
     // 정수형 배열 리스트 생성 -> 배열 리스트 에 42 추가 -> first에 정수형 숫자 
     ```
 
-    기본 타입과 래퍼타의 변환은 자동으로 일어난다.
+    기본 타입과 래퍼 타입의 변환은 자동으로 일어난다.
 
     1. add를 호출할 때, 오토박싱(autoboxing)을 거쳐 42를 담은 Integer 객체를 생성
     2. int형 변수 first에 넣기 전에 Integer 내부의 int 값을 돌려주도록 언박싱(unboxing)된다.
