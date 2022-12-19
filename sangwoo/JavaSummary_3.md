@@ -60,7 +60,7 @@ public interface IntSequence {
 
 <br>
 
-<h2>3.1.2 인터페이스 구현</h2>
+<h3>3.1.2 인터페이스 구현</h3>
 
 ---
 
@@ -113,7 +113,7 @@ public static double average(IntSequence seq, int n) {
 다음 클래스는 유한 시퀀스(가장 낮은 자릿수부터 시작해 양의 정수를 구성하는 숫자)를 돌려준다.
 
 ```java
-public class DigitSequence Implements IntSequence {
+public class DigitSequence implements IntSequence {
 	private int number;
 	
 	public DigitSequence(int n) {
@@ -140,12 +140,16 @@ public class DigitSequence Implements IntSequence {
 
 ****Note****
 <blockquote>
-클래스가 인터페이스의 메서드 중 일부만 구현한다면, 해당 클래스는 반드시 abstract 제어자로 선언해야 한다.
+선언부만 있고, 구현부가 없는 메소드를 추상 메소드라고 하며 반드시 abstract 제어자를 붙여야 한다.
+<br>
+또한, 하나 이상의 추상 메소드를 포함하고 있는 추상 클래스도 반드시 abstract 제어자를 붙여야 한다.
+<br>
+따라서 클래스가 인터페이스의 메서드 중 일부만 구현한다면, 해당 클래스는 반드시 abstract 제어자로 선언해야 한다.
 </blockquote>
 
 <br>
 
-<h2>3.1.3 인터페이스 타입으로 변환</h2>
+<h3>3.1.3 인터페이스 타입으로 변환</h3>
 
 ---
 
@@ -250,7 +254,7 @@ obj가 null이면 → obj instanceof Type 표현식은 false 가 된다. null은
 
 <br>
 
-<h2>3.1.5 인터페이스 확장</h2>
+<h3>3.1.5 인터페이스 확장</h3>
 
 ---
 
@@ -277,7 +281,7 @@ public interface Channel extends Closeable {
 
 <br>
 
-<h2>3.1.6 여러 인터페이스 구현</h2>
+<h3>3.1.6 여러 인터페이스 구현</h3>
 
 ---
 
@@ -292,7 +296,7 @@ public class FileSequence implements IntSequence, Closeable {
 
 <br>
 
-<h2>3.1.7 상수</h2>
+<h3>3.1.7 상수</h3>
 
 ---
 
@@ -313,3 +317,170 @@ public interface SwingContants {
 <blockquote>
 인터페이스 안에는 인스턴스 변수를 둘 수 없다. 인터페이스는 객체의 상태가 아니라 동작 (behavior)을 명시한다.
 </blockquote>
+
+<br><br>
+
+<h2>3.2 인터페이스의 정적 메서드, 기본 메서드, 비공개 메서드</h2>
+
+---
+
+
+자바 8 이전에는 인터페이스의 모든 메서드가 추상 메서드여야만 했다. 하지만 자바 9에서는 실제 구현이 있는 메서드 세 종류 (정적 메서드, 기본 메서드, 비공개 메서드)를 인터페이스에 추가할 수 있다.
+
+<br>
+
+<h3>3.2.1 정적 메서드</h3>
+
+---
+
+ex) IntSequence 인터페이스에는 주어진 정수의 숫자 시퀀스를 만들어 내는 정적 메서드인 digitsOf를 둘 수 있다.
+
+```java
+IntSequence digits = IntSequence.digitsOf(1729);
+// 위 메서드는 IntSequence 인터페이스를 구현한 클래스의 인스턴스를 돌려주지만,
+// 호출자는 이 인스턴스가 어느 클래스의 인스턴스인지 신경 쓸 필요는 없다.
+
+public interface IntSequence {
+	...
+	static IntSequence digitsOf(int n) {
+		return new DigitSequence(n);
+	}
+}
+```
+
+<br>
+
+**역주**
+<blockquote>
+자바 8부터는 정적 메서드와 기본 메서드를 인터페이스에 넣을 수 있고, 자바 9부터는 비공개 메서드를 인터페이스에 넣을 수 있다.
+</blockquote>
+
+<br>
+
+<h3>3.2.2 기본 메서드</h3>
+
+---
+
+인터페이스에 있는 어느 메서드에서든 default 제어자를 붙이면, 기본 구현을 작성할 수 있다.
+
+```java
+public interface IntSequence {
+	default boolean hasNext() { return true; }
+	// 연속된 숫자는 무한임을 표현함.
+	int next();
+}
+```
+
+이제 이 인터페이스를 구현하는 클래스는 hasNext 메서드를 오버라이드하거나 기본 구현을 상속하는 방법 중 하나를 선택할 수 있다.
+
+<br>
+
+**Note**
+<blockquote>
+이 기본 메서드 덕분에 인터페이스와 해당 인터페이스의 메서드를 대부분 또는 모두 구현한 동반 클래스를 제공하던 고전적인 패턴에 종지부를 찍을 수 있다. 이제는 인터페이스에 이런 메서드를 바로 구현한다.
+</blockquote>
+
+<br>
+
+<h3>기본 메서드의 주요 용도는 인터페이스를 진화(interface evolution) 시키는 것이다.</h3>
+<blockquote>
+
+```java
+public class Bag implements Collection
+// 자바 8 이전에 위 클래스를 작성했다고 가정.
+```
+
+이후에 Collection 인터페이스에 stream 메서드를 추가했고 stream은 기본 메서드가 아닐 때, Bag 클래스는 새로 추가된 메서드를 구현하지 않기에 컴파일되지 않는다.
+
+즉, 인터페이스에 기본 메서드가 아닌 메서드를 추가하면 **소스 수준에서 호환(source-compatible)** 되지 않는다.
+
+하지만, 클래스를 다시 컴파일하지 않고 Bag 클래스가 포함된 기존 JAR 파일을 그대로 사용한다면, 구현하지  않은 메서드가 있음에도 여전히 클래스를 로드한다. 프로그램에서 여전히 Bag 인스턴스를 생성할 수 있고, 문제도 전혀 없다. 
+
+즉, 인터페이스에 메서드를 추가하는 것은 
+**바이너리 수준에서 호환(binary-compatible)**
+된다.
+
+그렇다 하더라도, 프로그램에서 Bag 인스턴스로 stream 메서드를 호출하면 AbstractMethodError를 던진다.
+
+위 문제를 해결하기 위해 메서드를 default로 선언해야 한다. 즉, Bag 클래스는 이제 제대로 컴파일 된다. 또, Bag 클래스를 다시 컴파일하지 않고 로드한 후 Bag 인스턴스로 stream 메서드를 호출하면 정상적으로Collection.stream 메서드가 호출된다.
+</blockquote>
+
+<br>
+
+<h3>3.2.3 기본 메서드의 충돌 해결</h3>
+
+---
+
+```java
+// getId 메서드를 가진 Person 인터페이스가 있다고 가정,
+public interface Person {
+	String getName();
+	default int getId() { return 0; }
+}
+
+// Identified 인터페이스도 getId를 기본 메서드로 가진다고 가정
+public interface Identified {
+	default int getId() { return Math.abs(hashCode()); }
+}
+```
+
+<br>
+
+위 두 개의 인터페이스를 구현하는 클래스를 만든다.
+
+```java
+public class Employee implements Person, Identified {
+	...
+}
+```
+
+위 코드를 작성하면, 자바 컴파일러가 두 기본 메서드 중 하나를 우선해서 선택하지 못한다. 따라서 오류를 던진다.
+
+<br>
+
+해결방법
+
+1. Employee 클래스에 getId 메서드를 추가한 후 고유의 ID 체계를 구현
+2. 충돌한 메서드 중 하나에 위임.
+
+```java
+public class Employee implements Person, Identified {
+	public int getId() { return Identified.super.getId(); }
+}
+```
+
+<br>
+
+**Note**
+<blockquote>
+super 키워드로 슈퍼타입의 메서드를 호출할 수 있다. 따라서 위 예제에서 둘 중 어느 슈퍼타입의 기본 메서드를 원하는지 명시해야 오류를 피할 수 있다.
+</blockquote>
+
+<br>
+
+그렇다면, 한쪽에서 기본 메서드로 명시하지 않은 경우에는 어떻게 될까
+
+```java
+interface Identified {
+	int getId();
+}
+// 위처럼 Identified 인터페이스에서 getId를 기본 메서드로 구현하지 않는다고 가정,
+```
+
+이 때의 컴파일러는 Iendtified.getId가 수행할 동작을 Person.getId 메서드가 실제로 하는지 알 수 없다. 이에 자바 설계자들은 안전성과 일관성을 따르기로 했다. 두 인터페이스가 어떻게 충돌하는지는 중요하지 않고 적어도 한 인터페이스에서 구현을 제공하면 컴파일러는 오류를 보고하며, 모호성을 해결하는 일은 프로그래머의 책임이다.
+
+<br>
+
+<h3>3.2.4 비공개 메서드</h3>
+
+---
+
+비공개 메서드는 static 이나 인스턴스 메서드는 될 수 있지만, default 메서드는 (오버라이드가 가능하므로) 될 수 없다. 비공개 메서드는 인터페이스 자체에 있는 메서드에서만 쓸 수 있으므로, 인터페이스 안에 있는 다른 메서드의 헬퍼(helper) 메서드로만 사용할 수 있다.
+
+```java
+// IntSequence 인터페이스가 다음 메서드를 제공한다고 할 때,
+static of(int a);
+
+// 위 메서드는 다음 헬퍼 메서드를 호출할 수 있다.
+private static IntSequence makeFiniteSequence(int ... values) { ... }
+```
