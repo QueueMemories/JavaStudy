@@ -484,3 +484,235 @@ static of(int a);
 // 위 메서드는 다음 헬퍼 메서드를 호출할 수 있다.
 private static IntSequence makeFiniteSequence(int ... values) { ... }
 ```
+
+<br>
+
+<h2>3.3 인터페이스의 예</h2>
+
+---
+
+**인터페이스는 그저 클래스가 구현하기로 약속한 메서드 집합이다.**
+
+<br>
+
+<h3>3.3.1 Comparable 인터페이스</h3>
+
+---
+
+예시로 정렬 알고리즘이 있을 때, 비교하는 방식은 클래스마다 다를 것이다. 하지만 제공하는 기능은 같아야 하기 때문에, 모든 클래스가 호출될 메서드를 무엇으로 할지 합의하면 정렬 알고리즘은 정렬을 수행할 수 있다. 이 때, Comparable 인터페이스를 사용한다.
+
+```java
+public interface Comparable<T> {
+	int compareTo(T other);
+}
+// 비교 대상 타입이 다를 수 있기에, 타입 매개변수를 받는다.
+
+x.compareTo(y);
+// 위를 호출하면 compareTo는 x와 y중 어느 것이 앞에 오는지 나타낸다.
+// 양수면 : x > y, 음수 : y > x, 0 : x == y
+```
+
+<br>
+
+어떤 정수든 반환 값이 될 수 있기에, 정수 간 차이를 반환할 수 있다.
+
+```java
+public class Employee implements Comparable<Employee> {
+	...
+	public int compareTo(Employee other) {
+		return getId() - other.getId(); 
+	}
+}
+// ID가 항상 0 이상이여야 정상 작동. 
+```
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+**Integer.compare** - 두 정수의 차이가 오버플로될 수 있는 문제를 해결하는 방법. 모든 정수에 올바르게 작동한다.
+
+**Double.compare** - 부동소수점 값을 비교할 때는, 바로 반환하지 않고 정적 메서드인 이 메서드를 사용.
+</blockquote>
+
+<br>
+
+직원들을 급여 순으로 정렬하는 법!
+
+```java
+public class Employee implements Comparable<Employee> {
+	...
+	public int compareTo(Employee other) { 
+		return Double.compare(salary, other.salary)
+	}
+}
+```
+
+<br>
+
+**Note**
+
+<blockquote>
+
+compare 메서드가 other.salary에 접근하는 것은 규칙에 들어맞는다. 자바의 메서드는 자신이 속한 클래스의 모든 객체에 있는 비공개 기능에 접근할 수 있다.
+
+String 클래스에 존재하는 Arrays.sort 메서드는 Comparable 객체로 구성된 배열을 정렬한다.
+
+</blockquote>
+
+<br>
+
+**Note**
+
+<blockquote>
+
+Arrays.sort 메서드는 컴파일 시간에 인수가 Comparable 객체의 배열인지 검사하지 않는다. 대신 Comparable 인터페이스를 구현하지 않은 클래스 요소를 만나면 예외를 던진다.
+
+</blockquote>
+
+<br>
+
+<h3>3.3.2 Comparator 인터페이스</h3>
+
+---
+
+String 클래스는 comparTo 메서드를 두 가지 방법으로 구현하지 못한다. 이런 상황을 다룰 수 있는 Arrays.sort 메서드의 두 번째 버전이 있다. 배열과 비교자를 매개변수로 받는다.
+
+```java
+public interface Comparator<T> {
+	int compare(T first, T second);
+}
+```
+
+<br>
+
+문자열을 길이로 비교하기 위해서는 Comparator<String>을 구현하는 클래스를 정의해주어야 한다.
+
+```java
+class LengthComparator implements Comparator<String> {
+	public int compare(String first, String second) { 
+		return first.length() - second.length();
+	}
+}
+```
+
+<br>
+
+실제 비교를 위해서는 이 클래스의 인스턴스(객체)를 만들어야 한다.
+
+```java
+Comparator<String> comp = new LengthComparator();
+
+if (comp.compare(words[i], words[j]) > 0) …
+// 위에서 compare 메서드는 문자열 자체가 아니라 비교자 객체로 호출한다.
+```
+
+<br>
+
+**Note**
+
+<blockquote>
+
+LengthComparator 객체에는 상태가 없지만, compare 메서드는 정적 메서드가 아니므로 compare 메서드를 사용하고 싶다면 인스턴스가 필요하다.
+
+</blockquote>
+
+<br>
+
+만약, 배열을 정렬하고 싶다면 LengthComparator 객체를 Arrays.sort 메서드에 전달해야 한다.
+
+```java
+Arrays.sort(friends, new LengthComparator());
+```
+
+<br>
+
+<h3>3.3.3 Runnable 인터페이스</h3>
+
+---
+
+태스크를 정의하기 위해 Runnable 인터페이스를 구현해야 한다. Runnable 인터페이스는 메서드가 한 개만 존재한다.
+
+```java
+class HelloTask implements Runnable {
+	public void run() {
+		for (int i = 0; i < 1000; i++) {
+			System.out.println("Hello, World!");
+		}
+	}
+}
+```
+
+위 Hello, World를 1000번 출력하는 태스크를 새 스레드에서 실행하기 위해서는 Runnable로 스레드를 생성하고 시작해야 한다.
+
+```java
+Runnable task = new HelloTask();
+Thread thread = new Thread(task);
+thread.start();
+```
+
+이제 run 메서드는 별도의 스레드에서 실행되기에 현재 스레드는 다른 작업을 계속할 수 있다.
+
+<br>
+
+**Note**
+
+<blockquote>
+
+T 타입 결과를 반환하는 태스크에 사용하는 Callable<T>라는 인터페이스도 존재한다.
+
+</blockquote>
+
+<br>
+
+<h3>3.3.4 사용자 인터페이스 콜백</h3>
+
+---
+
+어떤 이벤트가 발생했을 때, 수행할 액션(action)(동작)을 지정해야 한다. 이런 액션을 콜백(callback)이라고 하는데, 사용자가 어떤 액션을 취하면 미리 지정해둔 코드를 역으로 호출하는 방식이다.
+
+<br>
+
+자바 기반으로 된 GUI 라이브러리에서는 콜백에 인터페이스를 사용한다. 
+<br>
+ex) JavaFX에서는 이벤트를 보고할 때, 다음 인터페이스를 사용함.
+
+```java
+public interface EventHandler<T> {
+	void handle(T event);
+}
+// 여기서 T는 보고할 이벤트 타입.
+```
+
+<br>
+
+수행할 액션을 지정하기 위해서는 EventHandler<T> 인터페이스를 구현해야 한다.
+
+```java
+class CancelAction implements EventHandler<ActionEvent> {
+	public void handle(ActionEvent event) {
+		System.out.println("Oh noes!");
+	}
+}
+```
+
+<br>
+
+구현 후에, 이 클래스의 객체를 생성하여 버튼에 추가한다.
+
+```java
+Button cancelButton = new Button("Cencel");
+cancelButton.setOnAction(new CancelAction());
+```
+
+<br>
+
+**Note**
+
+<blockquote>
+
+모든 사용자 인터페이스 툴킷에서 버튼을 클릭했을 때, 실행할 코드를 해당 버튼에 전달해야 한다는게 가장 중요하다.
+
+</blockquote>
