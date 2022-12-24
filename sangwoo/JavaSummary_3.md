@@ -809,3 +809,109 @@ Runnable 이나 Comparartor 처럼 액션을 표현하는 인터페이스가 있
 하지만, 자바에서는 이 중 하나만 람다 표현식으로 할 수 있다.
 
 바로 람다 표현식을 함수형 인터페이스 타입 변수에 저장하여 해당 인터페이스의 인스턴스로 변환하는 것이다.
+
+<br><br>
+
+<h2>3.5 메서드 참조와 생성자 참조</h2>
+
+---
+
+다른 코드에 전달하려는 액션을 수행하는 메서드가 이미 있을 수도 있다. 이 때 사용하는 메서드 참조 (method reference)용 특수 문법을 알아본다.
+
+<br>
+
+**즉, 메서드 참조는 람다 식에서 파라미터의 중복을 피하기 위해 사용한다. 파라미터가 중복되지 않았다면 사용 불가.**
+
+<br>
+
+<h3>3.5.1 메서드 참조</h3>
+
+---
+
+대, 소문자 구분 없이 문자열을 정렬하고자 하면, 다음 코드를 사용할 수 있다.
+
+```java
+Arrays.sort(strings, (x, y) -> x.comareToIgnoreCase(y));
+// or
+Arrays.sort(strings, String::compareToIgnoreCase);
+```
+
+ 두번째 코드에서 쓰인 String::compareToIgnoreCase는 (x, y) -> x.comareToIgnoreCase(y)에 대응하는 메서드 참조이다.
+
+ <br>
+
+```java
+// 리스트에서 null 값을 모두 제거하는 예
+list.removeIf(Objects::isNull);
+
+// 리스트트의 모든 요소를 출력하는 예
+list.forEach(x -> System.out.println(x));
+
+// 하지만 println 메서드를 forEach 메서드에 전달하는게 더 좋다.
+list.forEach(System.out::println);
+
+```
+
+<br>
+
+**:: 연산자**
+
+1. Class :: instanceMethod
+    
+    첫 번째 매개변수가 메서드의 수신자가 된다. 나머지 매개변수는 메서드에 전달한다.
+    
+2. Class :: staticMethod
+    
+    모든 매개변수가 정적 메서드로 전달된다. ( Objects::isNull == Objects.isNull(x) ) 
+    
+3. object :: instanceMethod
+    
+    주어진 객체로 메서드를 호출한다. ( System.out::println == x → System.out.println(x) )
+    
+
+    <br>
+
+**Note**
+<blockquote>
+그렇다면, 같은 이름으로 오버로도드 된 함수가 여러개 있을 때는 어떻게 될까?
+
+컴파일러가 스스로 어느 것을 의도했는지 문맥으로 알아낸다. ( int 인지 String 인지에 대해 )
+
+또한, 메서드 참조에서 this 매개변수를 캡처할 수 있다. ( this::equals == x → this.equals(x) )
+
+</blockquote>
+
+<br>
+
+<h3>3.5.2 생성자 참조</h3>
+
+---
+
+메서드 이름이 new 인것만 제외한다면, 메서드 참조와 같다. Employee::new 는 Employee의 생성자 참조이다.
+
+<br>
+
+메서드 참조와 똑같음.
+
+```java
+List<Member> memberList 
+	= memberNameList.stream() 
+	.map(name -> new Member(name)) 
+	.collect(Collectors.toList());
+
+List<Member> memberList 
+	= memberNameList.stream() 
+	.map(Member :: new)
+	.collect(Collectors.toList());
+// 위의 람다식을 줄여 아래의 생성자 참조를 통해 코드를 줄일 수 있다.
+```
+
+<br>
+
+배열 타입도 생성자 참조가 가능하다. int[]::new == n → new int[n]
+
+```java
+Employee[] buttons = stream.toArray(Employee[]::new);
+// 위에서 toArray 메서드는 이 생성자 참조가 가리키는 생성자를 호출한 후,
+// 올바른 타입의 배열을 생성하고 해당 배열에 내용을 채워 반환한다.
+```
