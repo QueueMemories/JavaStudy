@@ -915,3 +915,117 @@ Employee[] buttons = stream.toArray(Employee[]::new);
 // 위에서 toArray 메서드는 이 생성자 참조가 가리키는 생성자를 호출한 후,
 // 올바른 타입의 배열을 생성하고 해당 배열에 내용을 채워 반환한다.
 ```
+
+<br><br>
+
+<h2>3.6 람다 표현식 처리</h2>
+
+---
+
+이번에는 람다 표현식을 소비할 수 있는 메서드를 작성할 수 있는 방법을 알아본다.
+
+<br>
+
+<h3>3.6.1 지연 실행 구현</h3>
+
+---
+
+람다를 사용하는 핵심 목적은 **지연 실행**(deferred exccution)이다. 내가 쓰고 싶을 때 쓸 수 있다느 장점이 있다. 이것을 안 지키려면 그냥 람다로 감쌀 필요 없이 바로 실행하면 되기 때문이다.
+
+<br>
+
+**코드를 나중에 실행하는 이유**
+
+- 별도의 스레드에서 코드 실행
+- 코드를 여러 번 실행
+- 알고리즘에서 적절한 시점에 코드 실행 ( 정렬에서 비교 연산 같은 )
+- 어떤 행위 ( 버튼 클릭, 데이터 수신 등 ) 이 일어날 때 코드 실행
+- 필요할 때만 코드 실행
+
+<br>
+
+어떤 액션을 n번 반복하고자 하는 예제.
+
+```java
+repeat(10, () -> System.out.println("안녕하세요."));
+
+// repeat 메서드에서 람다를 받기 위해 함수형 인터페이스를 선택 or 드물게는 구현을 해야 한다.
+// 이 예제에서는 간단하게 Runnable 인터페이스를 사용한다.
+public static void repeat(int n, Runnable action) {
+	for (int i = 0; i < n; i++) action.run();
+}
+// 람다 표현식의 바디는 action.run()이 호출될 때, 실행된다는 점을 염두에 둔다.
+```
+
+<br>
+
+<h3>3.6.2 함수형 인터페이스 선택</h3>
+
+---
+
+함수형 프로그래밍 언어는 대부분 함수 타입이 **구조적(structural)**이다. <br>
+<blockquote>
+여기서 구조적이란, 언어의 타입 시스템에서 타입을 구조로 구분한다는 뜻이고, 이는 타입을 이름으로 구분하는 명목적 타입 지정과 대조를 이룬다.
+</blockquote>
+
+따라서, 문자열 두 개를 정수를 대응시키는 함수를 만들 때는 Function2<String, String, Integer> or (String, String) → int 형태의 타입을 사용한다. 
+
+<br>
+
+하지만, 자바에서는 Comparator<String> 같은 함수형 인터페이스 의도를 선언한다. 프로그래밍 언어 이론에서 이 방식을 **명목적 타입 지정(nominal typing)** 이라고 한다.
+
+<br>
+
+**자주 사용하는 함수형 인터페이스**
+
+<img src="https://velog.velcdn.com/images/koo9b9h/post/2914fde5-1475-4d91-941e-cf78441424ca/image.png">
+
+<br>
+
+예를 들어, 특정 기준에 맞는 파일을 처리하는 메서드를 작성하고자 한다. 이때, 의도를 나타내는 java.io.FileFilter 클래스와 Predicate<File> 중 어느 것을 사용하는 것이 맞을까 ?
+
+FileFilter 인스턴스를 만들어 내는 메서드가 많은 상황이 아닐 때는 표준 Predicate<File>을 사용하는 것이 더 좋은 방법이다.
+
+<br>
+
+**Note**
+
+<blockquote>
+대부분의 표준 함수형 인터페이스에는 함수를 생성하거나 결합하는 비추상 메서드가 존재한다. 
+
+```java
+Predicate.isEqual(a).or(Predicate.isEqual(b))
+// ==
+x -> a.equals(x) || b.equals(x)
+```
+
+</blockquote>
+
+<br>
+
+**기본 타입용 함수형 인터페이스**
+
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR02NUIVo2pIL3VZbotGpOOB3-g70nszrysow&usqp=CAU">
+
+ \* p, q는 int, long, double 이고 P, Q는 Int, Long, Double 이다.
+
+<br>
+
+<h3>3.6.3 독자적인 함수형 인터페이스 구현</h3>
+
+---
+
+만일 표준 함수형 인터페이스가 적합하지 않은 상황이라면, 인터페이스를 직접 구현해야 한다.
+
+<br>
+
+**Note**
+<blockquote>
+함수형 인터페이스에는 @FunctionalInterface 애너테이션을 붙이면 좋다.
+
+장점
+
+1. 애너테이션이 붙은 엔터티(entity)가 추상 메서드를 한 개만 가진 인터페이스인지 컴파일러가 검사해준다. (함수형 인터페이스에는 추상 메서드가 한개만 존재)
+2. 해당 인터페이스가 함수형 인터페이스라는 문장이 자바독 페이지에 추가된다.
+
+</blockquote>
