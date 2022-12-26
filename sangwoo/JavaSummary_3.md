@@ -1145,3 +1145,111 @@ for (String arg : args) {
 <blockquote>
 컴파일러가 모든 병행 접근 오류를 잡아낼 것이라고 믿으면 안된다. 캡처한 변수를 변경할 수 없다는 규칙은 지역 변수에만 해당하기 때문이다. (캡처한 변수가 객체라면 참조 값 자체를 변경시키지 않는 이상 내부의 값이 변경되는 것은 오류로 잡아내지 않기 때문)
 </blockquote>
+
+<br><br>
+
+<h2>3.8 고차 함수</h2>
+
+---
+
+**고차함수 : 함수를 처리하거나 반환하는 함수**
+
+<br>
+
+함수형 프로그래밍 언어에서는 함수가 일차 구성원(기본 요소)이다. 따라서 메서드에 숫자를 전달하고 생성하는 메서드를 만들 수 있는 것처럼, 함수를 인수와 반환 값으로 사용할 수 있다.
+
+<br>
+
+<h3>3.8.1 함수를 반환하는 메서드</h3>
+
+---
+
+함수(기술적으로는 함수형 인터페이스를 구현한 클래스의 인스턴스)를 만들어 내는 메서드를 작성하는 것을 주저하지 않아도 된다. 이러한 메서드는 함수형 인터페이스를 받는 메서드에 전달할 사용자 정의 함수를 만들 때 유용하다.
+
+<br>
+
+<h3>3.8.2 함수를 수정하는 메서드</h3>
+
+---
+
+```java
+public static Comparator<String> reverse(Comparator<String> comp) {
+	return (x, y) -> comp.compare(y, x);
+}
+// 문자열 비교자를 역으로 만드는 메서드를 작성하면 오름차순 또는 내림차순 문자열 비교자를 돌려준다.
+```
+
+위 메서드는 함수에도 작동한다. 즉, 함수를 인수로 받아서 수정된 함수를 반환한다.
+
+```java
+reverse(String::compareToIgnoreCase);
+// 대, 소문자를 구별하지 않는 내림차순 비교자를 얻으려면 위와 같이 호출한다.
+```
+
+<br>
+
+**Note**
+<blockquote>
+Comparator 인터페이스에는 이 방법으로 주어진 비교자의 역을 만들어 내는 기본 메서드 reversed가 있다.
+</blockquote>
+
+<br>
+
+<h3>3.8.3 Comparator 인터페이스의 메서드</h3>
+
+---
+
+comparing 메서드는 T 타입을 String 처럼 비교 가능한 타입으로 매핑하는 ‘키 추출(key extractor)’ 함수를 받는다. 비교 대상 각체에 키 추출 함수를 적용한 후에 반환 받은 키를 비교한다.
+
+```java
+Arrays.sort(people, Comparator.comparing(Person::getLastName));
+// Person 클래스의 getLastName 메서드를 이용하여,
+// Person 클래스의 인스턴스인 Person 객체의 배열(people)을 성으로 정렬할 수 있다.
+```
+
+<br>
+
+비교 대상이 같다면 ?
+
+```java
+Arrays.sort(people, Comparator.comparing(Person::getLastName))
+	.thenComparing(Person::getFirstName));
+// thenComparing 메서드로 다른 비교자를 연결하여 추가로 비교가 가능.
+// 성이 같으면 그 다음은 이름으로 비교!
+```
+
+<br>
+
+변형 1. 이름의 길이 순으로 정렬하는 법
+
+```java
+Array.sort(people, Comparator.comparing(Person::getLastName,
+	(s, t) -> s.length() - t.length()));
+// comparing과 thenComparing 메서드가 추출하는 키에 적용할 비교자를 지정할 수 있다.
+```
+
+<br>
+
+변형 2. 더 쉽게 이름의 길이 순으로 정렬하는 법
+
+```java
+Arrays.sort(people, Comparator.comparingInt(p -> p.getLastName().length()));
+// comparing과 thenComparing 메서드에는 둘다 
+// int, long, double 값의 박싱을 피하는 변형이 있다.
+```
+
+<br>
+
+키 함수가 null을 반환할 가능성이 있다면 nullsFirst와 nullsLast 어댑터를 사용한다.
+
+위 두 함수는 null 값을 만나도 예외를 던지지 않고 null 값을 정상 값보다 작은 값과 큰 값으로 취급하도록 비교자를 수정한다.
+
+<br>
+
+getMiddleName 함수를 통해 중간 이름으로 정렬하고자 한다. 만약, 중간 이름이 없을 때, null을 던진다면 다음과 같이 작성한다.
+
+```java
+Arrays.sort(people, comparing(Person::getMiddleName, nullsFirst(naturalOrder())));
+// 정적 메서드 reverseOrder 는 자연 순서의 역으로 비교하는 비교자를 돌려준다.
+// 자연 순서란, 각 클래스에 알맞는 순서를 뜻한다.
+```
