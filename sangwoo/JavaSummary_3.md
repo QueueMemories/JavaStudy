@@ -1253,3 +1253,118 @@ Arrays.sort(people, comparing(Person::getMiddleName, nullsFirst(naturalOrder()))
 // 정적 메서드 reverseOrder 는 자연 순서의 역으로 비교하는 비교자를 돌려준다.
 // 자연 순서란, 각 클래스에 알맞는 순서를 뜻한다.
 ```
+
+<br><br>
+
+<h2>3.9 지역 클래스와 익명 클래스</h2>
+
+---
+
+함수형 인터페이스라면 람다 표현식을 사용하겠지만, 때로는 함수형이 아닌 인터페이스를 간결하게 구현하고 싶을 수도 있다. 인터페이스 하나를 구현하는 클래스를 간결하게 정의하는 매커니즘을 알아본다.
+
+<br>
+
+<h3>3.9.1 지역 클래스</h3>
+
+---
+
+메서드 안에 정의한 클래스를 **지역 클래스(local class)** 라고 한다. 
+
+어떤 클래스가 인터페이스 하나를 구현하고, 메서드를 호출하는 쪽에서 구현 클래스가 아니라 인터페이스에만 관심이 있을 때, 전략적으로 지역 클래스를 사용한다.
+
+<br>
+
+
+주어진 범위에 있는 임의의 정수를 무한 시퀀스로 만들어 내는 randomInts 메서드가 있다고 가정하자.
+```java
+public static IntSequence randomInts(int low, int high);
+```
+
+이 때 randomInts의 반환값은 IntSequence 즉, 인터페이스 이므로 이 인터페이스를 구현한 클래스의 객체를 반환해야 한다. 하지만, 호출하는 쪽은 구현 클래스에 관심을 두지 않기에 구현 클래스를 메서드 안에 선언한다.
+
+<br>
+
+**Note**
+<blockquote>
+지역 클래스는 메서드 바깥에서 접근할 수 없으므로 public이나 private으로 선언할 수 없다.
+
+당연히 protected, static도 붙일 수 없다.
+</blockquote>
+
+<br>
+
+클래스를 지역 클래스로 만들면 얻게되는 이점.
+
+1. 클래스 이름이 메서드의 유효 범위 안으로 숨는다.
+2. 람다 표현식의 변수처럼 지역 클래스의 메서드 안에서 자신을 감싸는 유효 범위에 속한 변수에 접근할 수 있다. 
+
+```java
+private static Random generator = new Random();
+
+public static IntSequence randomInts(int low, int high) {
+	class RandomSequence implements IntSequence {
+		public int next() { return low + generator.nextInt(high - low + 1); }
+		public boolean hasNext() { return true; }
+	}
+	return new RandomSequence();
+}
+```
+
+일반 중첩 클래스로 바꾼다면 받는 값들을 인스턴스 변수에 저장하는 명시적인 생성자를 구현해야 하겠지만, 지역 클래스를 사용하면 메소드가 캡쳐해서 스택이 끝난 변수에도 접근할 수 있다. (closer 개념)
+
+<br>
+
+즉, 위 예제에서는 next 메서드가 low, high, generator 변수를 캡처한다.
+
+<br>
+
+<h3>3.9.2 익명 클래스</h3>
+
+---
+
+반환 값을 생성할 목적으로 지역 클래스 이름을 선언했다면, 이 때는 클래스를 익명(anonymous)으로 만들어도 된다.
+
+<br>
+
+```java
+private static Random generator = new Random();
+
+public static IntSequence randomInts(int low, int high) {
+	return new IntSequence {
+		public int next() { return low + generator.nextInt(high - low + 1); }
+		public boolean hasNext() { return true; }
+	}
+}
+```
+
+<br>
+
+**new interface() { 메서드 구현 }**
+
+위 표현식은 인터페이스와 인터페시으의 메서드를 구현하는 클래스를 정의하고, 이 클래스의 하나뿐인 객체를 생성한다.
+
+<br>
+
+**Note**
+
+<blockquote>
+
+new에서 ()는 생성 인수를 나타내기에, 익명 클래스의 기본 생성자가 호출된다.
+
+</blockquote>
+
+<br>
+
+람다 표현식이 생기기 전에는 익명 클래스가 러너블(runnable), 비교자(comparator), 함수 객체(function object)를 만드는 가장 간결한 문법이였다.
+
+그러므로 람다 표현식이 있는 요즘은 앞의 예제처럼 메서드를 두 개 이상 제공해야 할 때만 익명 클래스가 필요하다.
+
+<br>
+
+if 위의 익명 코드에서 IntSequence 인터페이스가 hasNext 메서드를 기본 메서드로 포함한다면, 아래와 같이 표현할 수 있다.
+
+```java
+public static IntSequence randomInts(int low, int high) {
+	return () -> low + generator.nextInt(high - low + 1);
+}
+```
