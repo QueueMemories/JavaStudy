@@ -511,3 +511,237 @@ public class ConcurrentWorker extends Worker {
 ```
 
 위에서 ConcurrentWorker의 work 메서드는 run 메서드에서 슈퍼클래스(Worker)의 work 메서드를 호출하는 Runnable로 스레드를 생성한다.
+
+<br><br>
+
+<h2>4.2 Object : 보편적 슈퍼클래스</h3>
+
+---
+
+자바에서 모든 클래스는 직 간접적으로 Object 클래스를 확장한다. 클래스에 명시적인 슈퍼클래스가 없으면 암시적으로 Object를 확장한다.
+
+```java
+// 만일
+public class Employee { ... } 
+// 위 코드를 작성했다면 이는
+public class Employee extends Object { ... }
+// 위 코드와 같다.
+```
+
+Object 클래스는 모든 자바 객체에 적용할 수 있는 메서드를 정의한다.
+
+<br>
+
+**Note**
+
+<blockquote>
+
+배열은 클래스다(기본 타입 배열도 클래스). 따라서 배열을 Object 타입의 참조로 변환할 수 있다.
+
+</blockquote>
+
+<br>
+
+**java.lang.Object 클래스의 메서드**
+
+![https://kookyungmin.github.io/image/java_image/java_image_144.png](https://kookyungmin.github.io/image/java_image/java_image_144.png)
+
+<br><br>
+
+<h3>4.2.1 toString 메서드</h3>
+
+---
+
+Object 클래스의 중요한 메서드 하나는 객체의 문자열 표현을 반환하는 toString 메서드이다. 
+toString 메서드는 주로 클래스 이름 뒤에 인스턴스 변수 목록을 대괄호([])로 감싸서 나열하는 형식을 따른다.
+
+<br>
+
+Employee 클래스에서 toString을 구현.
+
+```java
+public String toString() {
+	return getClass().getName() + "[name=" + name + ",salary=" + salary + "]";
+}
+// 위에서는 "Employee"라는 문자열을 직접 써넣는 대신 getClass().getName()을 호출하여,
+// 서브클래스에서도 toString 메서드가 올바르게 작동함을 알 수 있다.
+```
+
+<br>
+
+서브클래스에서는 super.toString()을 호출한 후 해당 서브클래스의 인스턴스 변수를 별도의 대괄호 쌍 안에 넣어 추가한다.
+
+```java
+public String toString() {
+	return super.toString() + "[bonus=" + bouns + "]";
+}
+```
+
+<br>
+
+객체를 문자열과 연결하면 자바 컴파일러가 해당 객체의 toString 메서드를 자동으로 호출한다.
+
+```java
+Point p = new Point(10, 20);
+String message = "The current position is " + p ;
+// 위에서는 문자열을 p.toString()과 연결한다.
+```
+
+<br>
+
+```java
+System.out.println(System.out);
+```
+
+위 문장을 출력하면 java.io.printStream@2f6684 를 출력한다.
+
+<br>
+
+그 이유는, PrintStream 클래스를 구현한 사람이 toString 메서드를 오버라이드하지 않았기 때문이다.
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+```java
+int[] primes = { 2, 3, 5, 6, 11, 13 }
+// 위 배열을 문자열로 출력하기 위해서는
+primes.toString() // 이 아닌
+Arrays.toString(primes) // 문법을 사용해야 한다.
+```
+
+int형 배열의 인스턴스인 primes의 메서드를 사용하는 것이 아닌, Arrays 클래스에 있는 toString 메서드의 매개변수로 primes를 넣어 원하는 결과를 얻을 수 있다.
+
+</blockquote>
+
+<br><br>
+
+<h3>4.2.2 equals 메서드</h3>
+
+---
+
+equals 메서드는 한 객체가 다른 객체와 동등한지 검사한다.
+
+equals 메서드는 Object 클래스에 구현되어 있다. equals 메서드를 오버라이드 하고 싶을 때는, 두 객체가 같은 내용을 담고 있을 때, 같다고 보는 **상태 기반 동등성 검사**가 필요할 때이다. 
+
+<br>
+ex) String 클래스에서는 두 문자열이 같은 문자로 구성되어 있는지 검사할 때 사용할 수 있도록 equals 메서드를 오버라이드 해놓았다.
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+equals 메서드를 오버라이드할 때마다 이것과 호환되는 hashCode 메서드도 반드시 작성해야 한다.
+
+</blockquote>
+
+<br>
+
+**equals 메서드를 구현할 때, 거쳐야 하는 단계**
+
+<blockquote>
+
+1. 일반적으로 동등한 객체는 동일하며, 이 검사는 비용이 아주 적게 든다.
+2. 모든 equals 메서드는 null과 비교하면 false를 반환해야 한다.
+3. equals 메서드는 Object. equals를 오버라이드하므로 매개변수의 타입은 Object다. 따라서 인스턴스 변수를 조사할 수 있도록 실제 타입으로 캐스트해야 한다. 캐스트하기 전에 getClass 메서드나 instanceof 연산자로 타입 검사를 수행한다.
+4. 마지막으로 인스턴스 변수를 비교한다. 기본 타입은 == 연산자로 비교한다. 하지만 double 값 일 때는 ±∞ 또는 NaN이 염려되므로 Double. equals를 사용한다. 객체일 때는 equals 메서드 의 널 안전 버전인 Objects. equals를 사용한다. 예를 들어 x가 null일 때 x. equals(y)는 예외를 던지지만, Objects. equals(x, y)는 false를 반환한다.
+
+</blockquote>
+
+<br>
+
+**Tip**
+
+<blockquote>
+
+인스턴스 변수가 배열이라면, 정적 메서드 Arrays.equals로 배열의 길이가 같고, 대응하는 배열 요소도 같은지 검사하면 된다.
+
+</blockquote>
+
+<br>
+
+서브클래스에서 equals 메서드를 정의하고자 할 때, 슈퍼클래스의 equals를 먼저 호출하고, 이게 false면 두 객체는 같을 수 없다.
+
+<br><br>
+
+<h3>4.2.3 hashCode 메서드</h3>
+
+---
+
+해시 코드는 객체에서 파생한 정수 값이다. 이는 중복되지 않도록 잘 뒤섞여 있어야 한다.
+
+```java
+int hash = 0;
+for (int i = 0; i < length(); i++) {
+	hash = 31 * hash + charAt(i);
+}
+// String에서 해시 코드를 계산하는 알고리즘
+```
+
+hashCode와 equals 메서드는 반드시 호환되어야 한다. 즉, x.equals(y)면 x.hashCode() == y.hashCode() 여야 한다.
+
+<br>
+
+equals 메서드를 재정의한다면, hashCode 메서드도 재정의해서 equals와 호환되게 해야 한다. 이때는, hashCode 메서드 안에서 인스턴스 변수의 해시 코드를 단순히 결합하면 된다.
+
+```java
+public int hashCode() {
+	 return Objects.hash(description, price);
+}
+```
+
+가변 인수 메서드인 Objects.hash는 인수들의 해시 코드를 계산해 결합한다. (널에 안전하다)
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+인터페이스에서는 Object 클래스의 메서드를 재정의하는 기본 메서드를 절대 만들 수 없다. 정의할 수 있다고 가정해도 ‘클래스 우선’ 규칙에 따라 이런 메서드는 절대로 기본 메서드보다 우선할 수 없다.
+
+</blockquote>
+
+<br><br>
+
+<h3>4.2.4 객체 복제</h3>
+
+---
+
+clone 메서드는 오버라이드하기 복잡할 뿐만 아니라, 필요한 경우도 드물어 마땅한 이유가 없다면 오버라이드 하지 않는 것이 좋다.
+
+<br>
+
+**clone 메서드의 목적은 객체의 ‘복제본’을 만드는 것**이다. clone을 사용하면 객체 참조만 배끼는 것이 아닌 값 자체를 복사하므로 두 객체 중 하나의 상태를 변경하더라도 나머지 하나는 변하지 않는다.
+
+<br>
+
+clone메서드는 Object 클래스에서 protected 로 선언되어 있어, 클래스 사용자가 인스턴스를 복제할 수 있게 하려면 반드시 clone 메서드를 오버라이드 해야 한다.
+
+<br>
+
+Object.clone 메서드는 **얕은 복사(shallow copy)** 를 수행한다. 즉, 원본 객체에 있는 모든 인스턴스 변수를 복제된 객체로 단순히 복사한다. 이때, 인스턴스 변수가 기본타입, 또는 불변 객체라면 상관 없지만, 객체를 향한 참조가 저장되어 있다면 원본과 복제본은 이 참조를 공유하게 되어, 한쪽에서 수정한 결과가 다른 쪽에 영향을 끼칠 수 있다. 따라서, 이러한 경우에는 clone 메서드를 오버라이드 하여 **깊은 복사(deep copy)** 를 수행해야 한다.
+
+<br>
+
+일반적으로 클래스를 구현하고자 할 때, 다음 상황을 판단해야 한다.
+
+<blockquote>
+
+1. clone 메서드를 구현하지 않아도 되는가 ?
+2. 구현해야 한다면 상속받은 clone 메서드를 사용해도 괜찮은가 ? 
+3. 그렇지 않다면 clone 메서드에서 깊은 복사를 수행해야 하는가 ?
+
+</blockquote>
+
+<br>
+
+두번째 경우에는 Cloneable 인터페이스를 구현해야 한다. 이는 아무런 메서드도 없는 인터패이스로 태깅(tagging) 인터페이스 또는 마커(marker) 인터페이스라고 한다. Object.clone 메서드는 얕은 복사를 수행하기에 앞서서 클래스가 Cloneable 인터페이스를 구현했는지 검사하고, 구현하지 않았다면 CloneNotSupportedException 을 던진다. 또한 공개 범위를 protected 에서 public으로 변경하고, 반환 타입을 변경해야 한다.
+
+<br>
+
+세번째 경우에 일단, 얕은 복사를 실행하고, 세부적으로 참조가 복사된 것은 따로 복제하여 각각 직접 대입해준다.
