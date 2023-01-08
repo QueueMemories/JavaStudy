@@ -745,3 +745,240 @@ Object.clone 메서드는 **얕은 복사(shallow copy)** 를 수행한다. 즉,
 <br>
 
 세번째 경우에 일단, 얕은 복사를 실행하고, 세부적으로 참조가 복사된 것은 따로 복제하여 각각 직접 대입해준다.
+
+<br><br>
+
+<h2>4.3 열거</h2>
+
+---
+
+```java
+public enum Size { SMALL, MEDIUM, LARGE, EXTRA_LARGE };
+```
+
+<br>
+
+<h3>4.3.1 열거의 메서드</h3>
+
+---
+
+열거 타입의 인스턴스는 유일하기 때문에, equals 메서드를 굳이 사용하지 않고 ==을 사용하면 된다. 또, toString 메서드를 구현하지 않아도 된다. 열거 객체의 이름을 돌려주는 toString 메서드를 자동으로 제공하기 때문이다. 
+
+<br>
+
+toString의 역은 각 열거 타입에 맞게 만들어지는 정적 메서드 valueOf이다.
+
+```java
+Size notMySize = Size.valueOf("SMALL");
+```
+
+<br>
+
+위 코드는 notMySize를 Size.SMALL로 설정한다. valueOf 메서드는 지정한 이름에 해당하는 인스턴스가 없다면 예외를 던진다.
+
+```java
+Size[] notMySize = Size.values();
+```
+
+<br>
+
+또한, 각 열거타입은 정적 메서드 values 를 가진다. 이 메서드는 모든 인스턴스를 선언한 순으로 정렬한 배열을 반환한다.
+
+<br>
+
+**TIP**
+
+<blockquote>
+
+향상된 for 루프에서 열거 타입의 모든 인스턴스를 순회할 때, values 메서드를 사용하면 된다.
+
+```java
+for (Size size : Size.values()) {
+  System.out.println("size = " + size);
+}
+```
+
+</blockquote>
+
+<br>
+
+ordinal 메서드는 enum 선언에서 인스턴스의 위치(0부터 시작)를 돌려준다. 
+
+```java
+Size.MEDIUM.ordinal()
+// enum 타입 Size 클래스에서 MEDIUM이 두번째에 있으므로 위 코드는 1을 반환
+```
+
+<br>
+
+모든 E 열거 타입은 자동으로 Comparable<E>를 구현하므로 해당 열거 타입에 나열된 객체만을 상대로 비교할 수 있다.
+
+<br>
+
+**java.lang.Enum<E> 클래스의 메서드**
+
+![https://velog.velcdn.com/images%2Fohzzi%2Fpost%2Fe8a58c0f-9bb2-4828-a156-7820776d42a3%2F20210211_205807.png](https://velog.velcdn.com/images%2Fohzzi%2Fpost%2Fe8a58c0f-9bb2-4828-a156-7820776d42a3%2F20210211_205807.png)
+
+<br><br>
+
+<h3>4.3.2 생성자, 메서드, 필드</h3>
+
+---
+
+열거 타입에는 생성자, 메서드, 필드를 추가할 수 있다.
+
+```java
+public enum Size {
+    SMALL("S"), MEDIUM("M"), LARGE("L"), EXTRA_LARGE("XL");
+
+    private String abbreviation;
+
+    Size(String abbreviation) {
+        this.abbreviation = abbreviation;
+    }
+
+    public String getAbbreviation() { return abbreviation; }
+}
+// 열거의 각 인스턴스는 한 번만 생성된다.
+```
+
+<br>
+
+**Note**
+
+<blockquote>
+
+열거의 생성자는 언제나 비공개다. Size처럼 private 제어자를 생략해도 되지만, 열거 타입의 생성자를 public 이나 protected로 선언하면 문법 오류가 일어난다.
+
+</blockquote>
+
+<br><br>
+
+<h3>4.3.3 인스턴스의 바디.</h3>
+
+---
+
+enum 인스턴스 각각에 메서드를 추가할 수 있지만, 열거에 정의된 메서드를 오버라이드하는 것이어야 한다.
+
+```java
+public enum Operation {
+    ADD("+") {
+        public int eval(int arg1, int arg2) { return arg1 + arg2; }
+    },
+    SUBTRACT("-") {
+        public int eval(int arg1, int arg2) { return arg1 - arg2; }
+    },
+    MULTIPLY("*") {
+        public int eval(int arg1, int arg2) { return arg1 * arg2; }
+    },
+    DIVIDE("/") {
+        public int eval(int arg1, int arg2) { return arg1 / arg2; }
+    };
+
+    private String symbol;
+    Operation(String symbol) { this.symbol = symbol; }
+    public String getSymbol() { return symbol; }
+    
+    public abstract int eval(int arg1, int arg2);
+		// 열거에 정의된 메서드.
+}
+```
+
+<br>
+
+계산기 프로그램의 루프에서는 사용자 입력에 따라 이 값 중 하나를 변수에 설정한 후, eval을 호출한다.
+
+```java
+Operation op = ...;
+int result = op.eval(first, second);
+```
+
+<br>
+
+**Note**
+
+<blockquote>
+
+기술적으로 각 상수는 Operation의 익명 서브클래스에 속한다. 따라서 익명 서브클래스의 바디에 넣을 수 있는 것은 열거 멤버의 바디에도 넣을 수 있다.
+
+</blockquote>
+
+<br><br>
+
+<h3>4.3.4 정적 멤버</h3>
+
+---
+
+열거에 정적 멤버를 넣을 수 있다. 하지만, 생성 순서에 주의해야 하고 열거 상수가 정적 멤버보다 먼저 생성되므로 열거 생성자에서 정적 멤버를 참조할 수 없다.
+
+<br>
+
+따라서, 위 문제를 해결하기 위해 정적 초기화 블록(static initializer)에서 초기화 해야 한다. 이 방식을 사용하면 열거 상수가 생성되고 나면 정적 변수 초기화와 정적 초기화 블록이 평소처럼 위쪽부터 차례로 실행된다.
+
+```java
+public enum Modifier {
+    PUBLIC, PRIVATE, PROTECTED, STATIC, FINAL, ABSTRACT;
+    private int mask;
+
+    static {
+        int maskBit = 1;
+        for (Modifier m : Modifier.values()) {
+            m.mask = maskBit;
+            maskBit *= 2; 
+        }
+    }
+    
+    public int getMask() {
+        return mask;
+    }
+}
+```
+
+<br>
+
+**Note**
+
+<blockquote>
+
+클래스 내부에 열거 타입을 중첩할 수도 있다. 이렇게 중첩된 열거는 암시적으로 정적 중첩 클래스가 된다. 따라서 해당 열거 타입의 메서드에서 감싸는 클래스의 인스턴스 변수를 참조할 수 없다.
+
+</blockquote>
+
+<br><br>
+
+<h3>4.3.5 열거를 기준으로 스위치하기 </h3>
+
+---
+
+switch 문에 열거 상수를 사용할 수 있다.
+
+```java
+public static int eval(Operation op, int arg1, int arg2) {
+    int result = 0;
+    switch (op) {
+        case ADD: result = arg1 + arg2; break;
+        case SUBTRACT: result = arg1 - arg2; break;
+        case MULTIPLY: result = arg1 * arg2; break;
+        case DIVIDE: result = arg1 / arg2; break;
+    }
+    return result;
+}
+```
+
+switch 문에서는 Operation.ADD가 아니라 ADD를 사용해야 한다.
+
+<br>
+
+**Tip**
+
+<blockquote>
+
+switch 문 밖에서 열거의 인스턴스를 간결한 이름으로 참조하고 싶을 때는 정적 임포트 선언을 사용한다.
+
+```java
+import static com.horstMann.corejava.Size.*;
+```
+
+위 코드를 작성하면 Size.SMALL 대신 SMALL로 사용이 가능하다.
+
+</blockquote>
