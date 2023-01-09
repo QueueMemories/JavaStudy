@@ -982,3 +982,271 @@ import static com.horstMann.corejava.Size.*;
 위 코드를 작성하면 Size.SMALL 대신 SMALL로 사용이 가능하다.
 
 </blockquote>
+
+<br><br>
+
+<h2>4.4 실행 시간 타입 정보와 리소스</h2>
+
+---
+
+자바는 실행 시간에 객체가 어느 클래스에 속하는지 알아낼 수 있다. 또한, 클래스를 어떻게 로드했는지 알아내서 클래스와 관련되 데이터, 즉 리소스(resource)를 로드할 수도 있다.
+
+<br>
+
+<h3>4.4.1 Class 클래스</h3>
+
+---
+
+어떤 객체의 참조가 저장된 Object 타입 변수가 있는 상태에서 해당 객체 정보를 더 얻고 싶다 가정한다.
+
+<br>
+
+getClass 메서드는 Class 클래스의 객체를 돌려준다.
+
+```java
+Class<?> cl = obj.getClass();
+```
+
+<br>
+
+위에서 Class 의 객체를 얻고 나면 클래스 이름을 알아낼 수 있다.
+
+```java
+System.out.println(cl.getName());
+```
+
+<br>
+
+정적 메서드 Class.forName으로 Class 객체를 얻는 방법도 있다.
+
+```java
+String className = "java.util.Scanner";
+Class<?> cl = Class.forName(className);
+// java.util.Scanner 클래스를 기술하는 객체다.
+```
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+Class.forName 메서드는 리플렉션을 이용하는 다른 메서드와 마찬가지로 무언가 잘못되면 검사 예외를 던진다.
+
+</blockquote>
+
+<br>
+
+Class.forName 메서드의 용도는 컴파일 시간에는 알려지지 않은 클래스의 Class 객체를 생성하는 것이다. 원하는 클래스를 미리 알고 있다면 Class.forName 대신 클래스 리터럴을 사용하자.
+
+
+```java
+Class<?> cl = java.lang.Scanner.class;
+// 이외에도 다른 타입 정보를 얻을 때도 /class 접미어를 사용할 수 있다.
+```
+
+이 위에서의 .class 는 그 자체로 클래스를 뜻하는 것은 아니고 Type이라고 생각하는게 더 맞는 표현이다.
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+getName 메서드는 배열 타입에서 이상한 이름을 반환한다. 따랏, 배열에 해당하는 Class 객체를 만들려면 getCanonicalName을 사용해 Class.forName 메서드를 호출해야 한다.
+
+</blockquote>
+
+<br>
+
+가상 머신은 각 타입별로 고유한 Class 객체를 관리하기에, ==연산자를 통해 클래스 객체를 비교할 수 있다.
+
+```java
+if (other.getClass() == Employee.class) ...
+```
+
+<br><br>
+
+<h3>4.4.2 리소스 로드</h3>
+
+---
+
+Class 클래스는 설정 파일이나 이미지처럼 프로그램에 필요한 리소스를 찾아오는 서비스를 제공한다.
+
+<br>
+
+```java
+InputStream stream = MyClass.class.getResourceAsStream("Config.txt");
+Scanner in = new Scaaner(stream);
+```
+
+클래스 파일이 있는 곳과 같은 디렉터리에 리소스를 넣었을 때, 위 방법으로 리소스 파일에 대응하는 입력 스트림을 열 수 있다.
+
+<br>
+
+**Note**
+
+<blockquote>
+
+일부 레거시 메서드와 javax.swing.ImageIcon  생성자는 URL 객체에서 데이터를 읽는다. 이런 메서드나 생성자를 생성할 때는 지정한 리소스에 대응하는 URL을 반환하는 getResource 메서드를 쓰면 된다.
+
+</blockquote>
+
+<br>
+
+리소스가 서브디렉터리에 있을 경우, 절대 경로 및 상대경로로 지정한다. 또한, 클래스들을 JAR 파일로 패키징할 때, 클래스 파일과 리소스를 함께 넣으면 해당 리소스도 찾아올 수 있다.
+
+<br><br>
+
+<h3>4.4.3 클래스 로더</h3>
+
+---
+
+클래스 파일에는 가상 머신 명령어가 저장된다. 각 클래스 파일은 단일 클래스나 인터페이스에 해당하는 명령어를 담는다. 클래스 파일을 파일 시스템, JAR 파일, 원격 위치에 둘 수 있고, 심지어 메모리에서 동적으로 생성할 수도 있다.
+
+<br>
+
+여기서 클래스 로더(class loader)란, 바이트를 로드해서 가상 머신의 클래스나 인터페이스로 변환하는 역할을 한다.
+
+<br>
+
+가상 머신은 main 메서드가 호출될 메인 클래스부터 시작해 필요할 때, 클래스 파일을 로드한다. 메인 클래스는 java.lang.System이나 java.util.Scanner 같은 클래스를 이용하므로, 이런 클래스도 로드하고, 이것이 의존하는 클래스도 로드한다.
+
+<br>
+
+**자바 프로그램을 실행할 때, 최소한으로 로드되는 클래스**
+
+1. **부트스트랩 클래스 로더(bootstrap class loader)** - 가장 기본적인 자바 라이브러리 클래스를 로드한다. 이는 가상 머신의 일부이다.
+2. **플랫폼 클래스 로더(platform class loader)** - 다른 라이브러리 클래스를 로드한다. 부트스트랩 클래스 로더가 로드하는 클래스와 달리 보안 정책으로 플랫폼 클래스 퍼미션을 구성할 수 있다.
+3. **시스템 클래스 로더(system class loader)** - 애플리케이션 클래스를 로드한다. 이 로더는 클래스 패스와 모듈 패스에 있는 디렉터리와 JAR 파일에서 클래스를 찾는다.
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+현재 버전의 JDK에서 플랫폼 클래스 로더와 시스템 클래스 로더를 찾기 위해서는 System.getProperty(”java.class.path”)를 사용해서 클래스 패스를 찾아야 한다.
+
+</blockquote>
+
+<br>
+
+독자적으로 URLClassLoader 인스턴스를 생성하여 클래스 패스에 없는 디렉터리나 JAR 파일에서 클래스를 로드할 수도 있다. (플러그인을 로드할 때 이 방법을 사용한다)
+
+```java
+URL[] urls = {
+	new URL("file:///path/to/directory/"),
+	new URL("file:///path/to/jarfile/jar")
+};
+String className = "com.mycompany.plugins.Entry";
+try (URLClassLoader loader = new URLClassLoader(urls)) {
+	Class<?> cl = Class.forName(className, true, loader);
+	// 이제 여기서 cl의 인스턴스를 생성하면 된다.
+}
+```
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+위의 forName메서드의 두번째 매개변수는 대상 클래스를 로드한 후, 정적 초기화가 일어남을 보장한다.
+
+</blockquote>
+
+<br>
+
+ClassLoader.loadClass 메서드는 정적 초기화 블록을 실행하지 않으므로 사용하지 않는게 좋다.
+
+<br>
+
+**Note**
+
+<blockquote>
+
+URLClassLoader는 파일 시스템에서 클래스를 로드한다. 다른 곳에서 클래스를 로드하기 위해서는 독자적으로 클래스 로더를 구현해야 한다. 이때, 꼭 구현해야 하는 메서드는 findClass 메서드 하나이다.
+
+</blockquote>
+
+<br><br>
+
+<h3>4.4.4 컨텍스트 클래스 로더</h3>
+
+---
+
+클래스는 다른 클래스에서 사용될 때, 투명하게(아무도 모르게) 로드되기에 대부분은 클래스 로딩 과정을 신경쓰지 않아도 된다.
+
+하지만, 클래스를 동적으로 로드하는 메서드가 있고, 또 다른 클래스 로더로 로드된 클래스에서 이 메서드를 호출하면 문제가 생기는 경우가 있다.
+
+<br>
+
+시스템 클래스 로더가 로드하는 유틸리티 클래스를 만들었고, 반환값이 Object인 createInstance 메소드를 만들었다고 가정 → 플러그인 JAR에서 클래스를 읽어 오는 또 다른 클래스 로더로 플러그인을 로드한다. → 이 플러그인은 Util.createInstance(”com.mycompany.plugins.MyClass”)를 호출해 플러그인 JAR에 들어 있는 클래스의 인스턴스를 생성한다.
+
+<br>
+
+위 경우에서 Util.createInstance는 자체적인 클래스 로더를 사용해 Class.forName을 실행하므로 해당 클래스로 더는 플러그인 JAR을 찾지 못하는데, 이 현상을 **클래스 로더 역전(classloader inversion)**이라고 한다.
+
+<br>
+
+클래스 로더 역전의 해결책은 클래스 로더를 유틸리티 메서드에 전달한 후, 이를 다시 forName 메서드에 전달하는 방법이 있다.
+
+<br>
+
+또 다른 방법은, 현재 스레드의 **컨텍스트 클래스 로더(context class loader)**를 사용하는 것이다. 메인 스레드의 컨텍스트 클래스 로더는 시스템 클래스 로더이고, 새 스레드가 생성될 때, 해당 스레드의 컨텍스트 클래스 로더는 생성하는 쪽 스레드의 컨텍스트 클래스 로더로 설정된다. 즉, 결국 그대로 두면 모든 스레드의 컨텍스트 클래스 로더는 시스템 클래스 로더로 설정된다.
+
+<br>
+
+```java
+Thread t = Thread.currentThread();
+t.setContextClassLoader(loader);
+```
+
+위 처럼 작성하면 유틸리티 메서드는 방금 설정한 컨텍스트 클래스 로더를 불러올 수 있다.
+
+애플리케이션은 플러그인 클래스의 메서드를 호출할 때 컨텍스트 클래스 로더를 플러그인 클래스 로더로 설정해야 한다. 그리고 플러그인 클래스의 메서드를 사용한 후에 이전 설정으로 복원해야 한다.
+
+<br>
+
+**Tip**
+
+<blockquote>
+
+클래스를 이름으로 로드하는 메서드를 작성할 때, 단순히 메서드가 속한 클래스의 클래스 로더를 사용하는 건 좋지 않다. 따라서, 메서드를 호출하는 쪽에서 명시적으로 클래스 로더를 전달하는 방법과 컨텍스트 클래스 로더를 사용하는 방법 중 하나를 선택할 수 있게 하는 것이 좋다.
+
+</blockquote>
+
+<br><br>
+
+<h3>4.4.5 서비스 로더</h3>
+
+---
+
+ServiceLoader 클래스를 이용하면 공통 인터페이스를 준수하는 서비스 구현체를 손쉽게 로드할 수 있다.
+
+<br>
+
+예시로, 서비스의 각 인스턴스에서 제공해야 하는 메서드를 나열한 인터페이스(원한다면 슈퍼클래스도 가능)를 정의한다. (암호화(encryption)를 제공하는 서비스)
+
+<br>
+
+서비스 제공자는 이 서비스를 구현하는(인터페이스를 구현하는) 클래스를 한개 이상 제공한다. 다형성의 원리.
+
+<br>
+
+구현 클래스는 서비스 인터페이스와 같은 패키지에 넣을 필요가 없다. 어느 패키지든 넣을 수 있고, 구현 클래스에는 인수 없는 생성자가 반드시 있어야만 한다.(자바 약속에 의해 super로 상위 클래스의 생성자에 접근하게 될 수도 있기 때문에)
+
+<br>
+
+이후 UTF-8 형식으로 인코딩된 텍스트 파일에 프로바이더 이름을 추가한다. META-INF/services 디렉터리에 만들어야 클래스 로더가 찾을 수 있다.
+
+<br>
+
+이제 프로그램에서 서비스 로더를 초기화한다.
+
+```java
+public static ServiceLoader<Cipher> cipherLoader = ServiceLoader.load(Cipher.class);
+```
+
+위 과정은 한번만 수행해야 한다. 이제 반복자로 모든 구현체를 반복하고, 적절한 객체를 골라서 서비스를 수행하면 된다.
