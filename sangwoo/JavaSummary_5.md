@@ -475,3 +475,53 @@ this.direction = Objects.requireNonNullElseGet(direction,
 	() -> System.getProperty("com.horstMann.direction.default"));
 // 이제 direction이 null일 때만 람다 표현식을 평가한다.
 ```
+
+<br><br>
+
+<h3>5.2.2 단정 활성화와 비활성화</h3>
+
+---
+
+단정은 기본적으로 비활성화되어 있다. 단정을 활성화하기 위해서는 -enableassertions나 -ea 옵션으로 프로그램을 실행해야 한다.
+
+```java
+java -ea MainClass
+```
+
+<br>
+
+단정을 활성화하거나 비활성화하는 일은 클래스 로더가 처리하기에, 프로그램을 다시 컴파일 하지 않아도 된다. 또, 클래스 로더는 단정이 비활성화되어 있으면 단정 코드를 제거해서 프로그램 실행이 느려지지 않게 한다. 
+
+<br>
+
+```java
+java -ea:MyClass -ea:com.mycompany.mylib... MainClass
+// 특정 클래스나 전체 패키지에 단정을 활성화할 수도 있다.
+```
+
+위 명령어는 MyClass 클래스와 com.mycompany.mylib 패키지, 그 서브 패키지에 속한 모든 클래스에 단정을 활성화한다. 즉, -ea:… 옵션은 기본 패키지에 속한 모든 클래스에 단정을 활성화한다.
+
+<br>
+
+반대로, -disableassertions나 -da 옵션으로 특정 클래스와 패키지에 단정을 비활성화할 수도 있다.
+
+```java
+java -ea:... -da:MyClass MainClass
+```
+
+위 두개의 옵션을 사용하더라도 클래스 로더 없이 로드되는 ‘시스템 클래스’에는 적용되지 않는다. 시스템 클래스에 단정을 활성화하려면 -enablesystemassertions/esa 스위치를 사용해야 한다.
+
+<br>
+
+**프로그램에서 클래스 로더의 단정 상태를 제어할 수 있는 메서드**
+
+<blockquote>
+
+```java
+void ClassLoader.setDefaultAssertionStatues(boolean enabled);
+void ClassLoader.setClassAssertionStatus(String className, boolean enabled);
+void ClassLoader.setPackageAssertionStatus(String packageName, boolean enabled);
+```
+
+setPackageAssertionStatus 메서드는 -enableassertions 명령줄 옵션과 마찬가지로 지정한 패키지와 그 서브 패키지의 단정 상태를 설정한다.
+</blockquote>
