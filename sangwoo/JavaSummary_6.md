@@ -92,3 +92,166 @@ public static void printNames(ArrayList<? extends Employee> staff) {
 ArrayList<? extends Employee> 클래스에 속한 get 메서드 반환 타입은 똑같이 ( ? extends Employee ) 가 된다. 따라서 Employee e = staff.get(i);는 올바른 문장이 된다.
 
 ( ? extends Employee를 Empolyee ) 로 변환할 수는 있지만, 그 어떤 것도 ( ? extends Employee ) 로는 변환할 수 없다. 이게 ArrayList<? extends Employee>에서 읽을 수는 있지만, 쓸 수는 없는 이유이다.
+
+<br><br>
+
+<h3>6.4.2 슈퍼타입 와일드카드</h3>
+
+---
+
+와일드카드 타입 ( ? extends Employee ) 는 Employee의 서브타입을 나타낸다. 이 반대로는 ( ? super Employee )로, 슈퍼타입을 나타내는 와일드카드 타입이다. 이 타입은 보통 함수형 객체에서 매개변수로 유용하다. 
+
+<br>
+
+Predicate 인터페이스 T 타입 객체에 특정 프로퍼티가 있는지 검사하는 메서드가 있는데 위 상황을 보여주는 전형적인 예이다.
+
+```java
+public interface Predicate<T> {
+	boolean test(T arg);
+	...
+}
+```
+
+<br>
+
+```java
+// 특정 프로퍼티가 있는 모든 직원의 이름을 호출한다.
+public static void printAll(Employee[] staff, Predicate<Employee> filter) {
+	for (Employee e : staff)
+		if (filter.test(e))
+			System.out.println(e.getName());
+}
+```
+<br>
+Predicate<Employee> 타입 객체를 인수로 전달해 이 메서드를 호출할 수 있다. 
+Predicate는 함수형 인터페이스이므로 다음과 같이 람다 표현식을 전달해도 된다.
+
+<br>
+
+```java
+printAll(employee, e -> e.getSalary() > 100000);
+
+// Predicate<Object>를 사용한 예
+Predicate<Object> evenLength = e -> e.toString().length() % 2 == 0;
+printAll(employee, evenLength);
+```
+
+위에서 Predicate 인터페이스는 불변이므로 Predicate<Object>와 Predicate<Employee> 사이에는 아무런 관계가 없다. 이를 해결하기 위해서는 Predicate<? super Employee>를 모두 허용하는 것이다.
+
+<br>
+
+```java
+public static void printAll(Employee[] staff, Predicate<? super Employee> filter) {
+	for (Employee e : staff)
+		if (filter.test(e))
+			System.out.println(e.getName());
+}
+```
+
+위에서 test의 매개변수 타입은 Employee의 슈퍼타입이므로 Employee 객체도 안전하게 전달할 수 있다. 제네릭 함수형 인터페이스를 메서드 매개변수로 받을 때는 super 와일드카드를 사용해야 한다.
+
+<br>
+
+**Note**
+
+<blockquote>
+
+와일드카드에 ‘PECS’라는 약자를 사용하는데, 이는 producer(생산자)에는 extends, consumer(소비자)에는 super를 사용한다는 뜻이다.
+
+</blockquote>
+
+<br><br>
+
+<h3>6.4.3 타입 변수를 이용한 와일드카드</h3>
+
+---
+
+```java
+public static <T> void printAll(T[] elements, Predicate<? super > filter)
+```
+
+위 메서드는 T타입이나 T의 슈퍼타입 요소용 필터를 매개변수로 받는다.
+
+<br>
+
+다음으로 Collection<E> 인터페이스에 존재하는 메서드를 알아본다. Collection<E> 인터페이스는 E 타입 요소의 컬렉션을 나타낸다.
+
+<br>
+
+```java
+public boolean addAll(Collection<? extends E> c)
+```
+
+위 메서드는 요소 타입이 E 또는 E의 서브타입인 다른 컬렉션의 모든 요소를 추가할 수 있다.
+
+<br>
+
+Comparable의 타입 매개변수는 compareTo 메서드의 인수 타입을 나타낸다. 따라서 Collections.sort를 다음과 같이 선언해도 괜찮아 보인다.
+
+```java
+public static <T extends Comparable<T>> void sort(List<T> list)
+```
+
+<br>
+
+하지만, 이는 너무 제한적이다. Employee 클래스가 Comparable<Employee>를 구현하고 직원을 급여로 비교하고, Manager 클래스가 Employee를 확장한다고 하자. 이때, Manager는 Comparable<Manager>가 아니라 Comparable<Employee>를 구현한다는 점에 유의한다. 따라서 Manager는 Comparable<Manager>의 서브타입이 아니라 Comparable<? super Manager>의 서브타입이다.
+
+<br><br>
+
+<h3>6.4.4 경계 없는 와일드카드</h3>
+
+---
+
+아주 일반적인 연산만 수행하는 상황에서는 경계 없는 와일드카드를 사용할 수 있다.
+
+```java
+// ArrayList에 null 요소가 들어있는지 검사하는 메서드
+public static boolean hasNulls(ArrayList<?> elements) {
+	for (Object e : elements) {
+		if (e == null) return true;
+	}
+	return false;
+}
+```
+
+위에서 ArrayList의 타입 매개변수는 중요하지 않기에 ArrayList<?>를 사용하는 것이 타당하다.
+
+<br><br>
+
+<h3>6.4.5 와일드카드 캡처</h3>
+
+---
+
+와일드카드를 이용해 swap 메서드를 정의해보자.
+
+```java
+public static void swap(ArrayList<?> elements, int i, int j) {
+	? temp = elements.get(i); // 작동하지 않음.
+	elements.set(i, elements.get(j));
+	elements.set(j, temp);
+}
+```
+
+<br>
+
+?를 타입 인수로 사용할 수 있지만, 타입으로는 사용할 수 없다. 하지만 이를 우회해서 해결하는 방법이 있는데, 헬퍼 메서드를 추가하면 된다.
+
+<br>
+
+```java
+public static void swap(ArrayList<?> elements, int i, int j) {
+	swapHelper(elements, i, j);
+}
+
+private static <T> void swapHelper(ArrayList<T> elements, int i, int j) {
+	T temp = elements.get(i);
+	elements.set(i, elements.get(j));
+	elements.set(j, temp);
+}
+```
+
+위에서는 **와일드카드 캡처(wildcard capture)** 라는 특별한 규칙 덕분에 swapHelper 호출이 유효하다. swapHelper 메서드의 T 타입 매개변수는 와일드카드 타입을 ‘캡처(capture)’한다. swapHelper는 매개변수에 와일드카드가 포함된 메서드가 아니라 제네릭 메서드이므로 T타입 변수로 변수를 선언할 수 있다.
+
+<br>
+
+와일드카드 캡처의 이점 - API 사용자가 제네릭 메서드 대신 이해하기 쉬운 ArrayList<?>를 볼 수 있다는 점.
