@@ -76,7 +76,58 @@ Entry<String, Integer> entry = new Entry<>("Fred", 42);
 
 <br><br>
 
-6.2 ~ 6.3 내용이 들어올 공간입니다.
+<h2>6.2 제네릭 메서드</h2>
+
+---
+
+제네릭 클래스가 타입 매개변수를 받는 클래스인 것 처럼, **제네릭 메서드(generic method)** 는 타입 매개변수를 받는 메서드이다. 이는 일반 클래스나 제네릭 클래스에 속할 수 있다.
+
+<br>
+
+```java
+// 일반 클래스에 속한 제네릭 메서드의 예
+public class Arrays {
+	public static <T> void swap(T[] array, int i, int j) {
+		T temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
+	}
+}
+
+// 배열에 들어 있는 요소의 타입이 기본 타입만 아니라면 swap 메서드로,
+// 임의의 배열에 들어 있는 요소를 교환할 수 있다.
+String[] friends = ...;
+Arrays.swap(friends, 0, 1);
+```
+
+<br>
+
+제네릭 메서드를 선언할 때는 타입 매개변수를 제어자(public 이나 static 같은)와 반환 타입 사이에 두어야 한다.
+
+```java
+public static <T> void swap(T[] array, int i, int j)
+```
+
+<br>
+
+제네릭 메서드를 호출할 때는,  타입 매개변수를 명시하지 않아도 된다. 컴파일러가 메서드 매개변수와 반환 타입에서 타입 매개변수를 추론하기 때문이다.
+
+<br>
+
+즉, Arrays.swap(friends, 0, 1); 이 호출에서 friends의 타입이 String[]이므로 컴파일러는 T가 String이라고 추론한다. 아래와 같이 명시적으로 타입을 지정하고 호출해도 상관없다.
+
+```java
+Arrays.<String>swap(friends, 0, 1);
+```
+
+<br>
+
+타입을 명시적으로 지정하면 문제가 생겼을 때, 더 자세한 오류 메시지를 얻을 수 있다.
+
+
+<br><br>
+
+6.3 내용이 들어올 공간입니다.
 
 <br><br>
 
