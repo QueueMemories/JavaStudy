@@ -124,10 +124,44 @@ Arrays.<String>swap(friends, 0, 1);
 
 타입을 명시적으로 지정하면 문제가 생겼을 때, 더 자세한 오류 메시지를 얻을 수 있다.
 
-
 <br><br>
 
-6.3 내용이 들어올 공간입니다.
+<h2>6.3 타입 경계</h2>
+
+---
+
+제네릭 클래스나 제네릭 메서드가 받는 타입 매개변수의 타입을 제한해야 할 때, 타입 경계(type bound)를 지정하면 타입이 특정 클래스를 확장하거나 특정 인터페이스를 구현할 수 있다.
+
+<br>
+
+예를 들어 AutoCloseable 인터페이스를 구현하는 클래스의 객체로 구성된 ArrayList가 있고, 이 리스트에 들어 있는 객체를 모두 닫는다고 가정한다.
+
+```java
+public static <T extends AutoCloseable> void closeAll(ArrayList<T> elems)
+				throws Exception {
+	for (T elem : elems) elem.close();
+} 
+```
+
+<br>
+
+위에서 타입 경계로 쓰인 extends AutoCloseable은 요소 타입이 AutoCloseable의 서브타입임을 보장한다. 따라서, 이 메서드에 ArrayList<PrintStream>은 전달할 수 있지만, ArrayList<String>은 전달할 수 없다. 타입 경계에서 쓰이는 extends 키워드는 ‘서브타입’을 의미한다.
+
+<br>
+
+다음과 같이 타입 매개변수에 다중 경계를 지정할 수도 있다.
+
+```java
+T extends Runnable & AutoCloseable
+```
+
+<br>
+
+이 문법은 여러 예외를 잡아내는 문법과도 유사하다. 차이점이 있다면 여러 예외는 | 연산자로 결합하지만, 타입 경계로 사용하는 타입은 & 연산자로 결합한다는 것이다.
+
+<br>
+
+인터페이스 경계는 원하는 개수만큼 지정할 수 있지만, 클래스 경계는 한 개만 지정할 수 있다. 클래스를 경계로 지정할 때는 경계 목록에서 첫 번째에 두어야 한다.
 
 <br><br>
 
