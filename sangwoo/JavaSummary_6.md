@@ -23,7 +23,60 @@ ArrayList\<T>에서 ArrayList 클래스를 **제네릭(generic)** 이라고 하�
 
 <br><br>
 
-6.1 ~ 6.3 내용이 들어올 공간입니다.
+<h2>6.1 제네릭 클래스</h2>
+
+---
+
+**제네릭 클래스 (generic class)** 는 **타입 매개변수(type parameter)** 가 한 개 이상 있는 클래스다.
+
+<br>
+
+```java
+// 키 & 값 쌍을 저장하는 클래스
+public class Entry<K, V> {
+	private K key;
+	private V value;
+
+	public Entry(K key, V value) {
+		this.key = key;
+		this.value = value;
+	}
+
+	public K getKey() { return key };
+	public V getValue() { return value };
+}
+```
+
+위에서 클래스 이름(Entry) 뒤에 오는 <> 안에 매개변수 K와 V를 명시했다. 이는 인스턴스 변수, 메서드 매개변수, 반환 값의 타입으로 사용된다.
+
+<br>
+
+위에서 프로그래머는 타입 변수를 원하는 타입으로 교체해 제네릭 클래스를 인스턴스화한다. 즉, 구체적인 인스턴스로 만든다.
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+기본 타입으로는 타입 매개변수를 인스턴스화 할 수 없다.
+
+</blockquote>
+
+<br>
+
+제네릭 클래스의 객체를 생성(construct)할 때, 생성자의 타입 배개변수를 생략할 수 있다.
+
+```java
+Entry<String, Integer> entry = new Entry<>("Fred", 42);
+// new Entry<String, Integer>("Fred", 42); 와 같다.
+```
+
+그렇더라도, 다이아몬드(diamond)라고 불리우는 <>은 불여주어야 한다. 이 문법을 사용해야 생성자의 타입 매개변수가 추론된다.
+
+<br><br>
+
+6.2 ~ 6.3 내용이 들어올 공간입니다.
 
 <br><br>
 
@@ -65,6 +118,7 @@ empls.add(new Emplyee(...)); // bosses에 관리자가 아닌 직원을 집어�
 <br>
 
 자바에서는 **와일드카드(wildcard)** 로 메서드의 매개변수와 반환 타입이 변하는 방식을 지정한다. 이 매커니즘을 **사용처 가변성(use-site variance)** 이라고도 한다.
+
 
 <br><br>
 
@@ -255,3 +309,141 @@ private static <T> void swapHelper(ArrayList<T> elements, int i, int j) {
 <br>
 
 와일드카드 캡처의 이점 - API 사용자가 제네릭 메서드 대신 이해하기 쉬운 ArrayList<?>를 볼 수 있다는 점.
+
+<br><br>
+
+
+<h2>6.5 자바 가상 머신에서 보는 제네릭</h2>
+
+---
+
+자바에 제네릭 타입과 메서드를 추가하는 방식을 채택할 때, 설계자들은 가상 머신에서 타입을 ‘지우는’ 방식으로 구현해 기존 버전 클래스와 호환되게 했다. 이는 기존 방식에서 제네릭으로 옮겨갈 수 있게 해서 인기가 많았지만, 문제가 있었다. 호환성 관점에서 만든 타협이 너무 자주 일어난다는 것이다. 이는 아직도 해결되지 못했다.
+
+<br>
+
+<h3>6.5.1 타입 소거</h3>
+
+---
+
+제네릭 타입을 정의하면 해당 타입은 **로(raw) 타입**으로 컴파일된다. raw 타입이란, 제네릭 타입에서 타입이 소거된 타입을 로 타입이라고 한다. 일반 클래스에는 로 타입이라는 개념이 없다. 기존에 살펴봤던 Entry<K, V> 클래스는 다음과 같이 변환된다.
+
+<br>
+
+```java
+public class Entry {
+	private Object key;
+	private Object value;
+	...
+}
+```
+
+K와 V가 모두 Object로 교체되었다.
+
+<br>
+
+```java
+public class Entry<K extends Comparable<? super K> & SErializable,
+				   V extends Serializable>
+// 만일 Entry 클래스를 위처럼 선언했다면,
+
+public class Entry {
+	private Comparable key;
+	private Serializable value;
+	...
+}
+// 위 클래스로 교체된다.
+```
+
+<br><br>
+
+<h3>6.5.2 캐스트 삽입</h3>
+
+---
+
+타입 소거는 위험해 보이지만, 실제로는 안전하다. 하지만 만일 캐스트를 사용했거나, 제네릭과 로 Entry 타입을 섞어서 사용하여 프로그램을 컴파일 할 때, ‘비검사(unchecked)’ 경로를 표시했다고 하자. 이 때는 기존에 명시했던 타입 말고, 서로 다른 타입으로 된 키가 포함될 수도 있다. 따라서 실행 시간에 안전성 검사도 필요하다. 컴파일러는 소거된 타입이 있는 표현식을 읽어 올 때마다 캐스트를 삽입한다.
+
+<br>
+
+```java
+Entry<String, Integer> entry = ...;
+String key = entry.getKey();
+
+// 타입이 소거된 getKey 메서드는 Object를 반환하므로 컴파일러는 다음 코드를 만들어 낸다.
+String key = (String) entry.getKey();
+```
+
+<br><br>
+
+<h3>6.5.3 브리지 메서드</h3>
+
+---
+
+메서드 매개변수와 반환 타입을 소거할 때는 가끔 컴파일러가 **브리지 메서드(bridge method)** 를 만들어 내야 한다.
+
+```java
+public class WordList extends ArrayList<String> {
+	public boolean add(String e) {
+		return isBadWord(e) ? false : super.add(e);
+	}
+}
+
+// 코드 실행부분
+
+WordList words = ...;
+ArrayList<String> strings = words; // 슈퍼클래스로 변환하기에 상관없음.
+strings.add("C++");
+```
+
+strings.add() 호출은 타입이 소거된 ArrayList 클래스의 add(Object) 메서드를 호출한다. 이때 동적 메서드 조회가 일어나서 WordList 객체로 add를 호출하면 ArrayList가 아니라 WordList의 add 메서드가 호출된다.
+
+<br>
+
+컴파일러는 이를 의도하기 위해 WordList 클래스 안에 다음 브리지 메서드를 만들어 놓는다.
+
+```java
+public boolean add(Object e) {
+	return add((String) e);
+}
+```
+
+<br>
+
+strings.add(”C++”) 호출은 add(Object) 메서드를 호출하고, 다시 이 메서드는 WordList 클래스의 add(String) 메서드를 호출한다. 반환 타입이 변할 때도 브리지 메서드가 호출될 수 있다.
+
+<br>
+
+```java
+public class WordList extends ArrayList<String> {
+	public String get(int i) {
+		return super.get(i).toLowerCase();
+	}
+	...
+}
+```
+
+<br>
+
+WordList 클래스에는 get 메서드가 두개 있다.
+
+```java
+String get(int) // WordList에 정의되어 있다.
+Object get(int) // ArrayList에 정의된 메서드를 오버라이드한다.
+```
+
+<br>
+
+두 번째 메서드는 컴파일러가 만들어 낸 것으로 첫 번째 메서드를 호출한다. 이번에도 컴파일러는 동적 메서드 조회가 일어나게 하려고 브리지 메서드를 만들어 놓는다.
+
+<br>
+
+위 메서드 두개는 매개변수 타입이 같고 반환 타입이 다르다. 자바에서는 이런 메서드 쌍을 구현할 수 없지만, 가상 머신에서는 메서드를 이름, 매개변수 타입, 그리고 반환 타입으로 명시하기에 컴파일러가 이 메서드 쌍을 만들어 낼 수 있다.
+
+<br>
+
+**Note**
+
+<blockquote>
+
+제네릭 타입에만 브리지 메서드를 사용하는 것은 아니다. 공변 반환 타입(covariant return type)을 구현할 때도 브리지 메서드가 사용된다.
+
+</blockquote>
