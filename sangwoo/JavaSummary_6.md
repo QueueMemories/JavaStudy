@@ -673,3 +673,180 @@ public static <T> T[] repeat(int n, T obj, T[] array) {
 	return result;
 }
 ```
+
+<br><br>
+
+<h3>6.6.4 매개변수화된 타입의 배열을 생성할 수 없다</h3>
+
+---
+
+```java
+Entry<String, Integer>[] entries = new Entry<String, Integer>[100];
+// 오류 - 제네릭 컴포넌트 타입으로 구성된 배열은 생성할 수 없다.
+```
+
+<br>
+
+하지만, Entry<String, Integer>[] 타입은 규칙에 들어맞는다. 따라서 이 타입 변수를 선언할 수 있다.
+
+```java
+@SuppressWarnings("unchecked") Entry<String, Integer>[] entries 
+	= (Entry<String, Integer>[]) new Entry<?, ?>[100];
+```
+
+<br>
+
+그렇다 해도, 배열 리스트를 사용하는 방법이 더 간편하다.
+
+```java
+ArrayList<Entry<String, Integer>> entries = new ArrayList<>(100);
+```
+
+<br>
+
+가변 인수 매개변수가 사실은 배열이라는 점을 떠올린다. 이런 매개변수가 제네릭이면 제네릭 배열 생성에 대한 제한을 우회할 수 있다.
+
+<br>
+
+```java
+public static <T> ArrayList<T> asList(T... elements) {
+	ArrayList<T> result = new ArrayList<>();
+	for (T e : elements) result.add(e);
+	return result;
+}
+
+// 호출하는 부분
+Entry<String, Integer> entry1 = ...;
+Entry<String, Integer> entry2 = ...;
+ArrayList<Entry<String, Integer>> entries = Lists.asList(entry1, entry2);
+```
+
+<br>
+
+T의 추론 타입이 Entry<String, Integer> 라는 제네릭 타입이므로 elements는 Entry<String, Integer> 타입의 배열이다. 이런 종류의 배열은 프로그래머가 직접할 수 없다. 이때 컴파일러는 경고를 날리고, 메서드가 매개변수 배열에서 요소를 읽기만 한다면,  @SafeVarargs 애너테이션으로 경고를 억제해야 한다.
+
+<br>
+
+```java
+@SafeVarargs public static <T> ArrayList<T> asList(T... elements)
+```
+
+
+
+@SafeVarargs 애너테이션은 static, final, private 메서드나 생성자에 적용할 수 있다. 나머지 메서드는 오버라이드 될 수 있으므로 이 애너테이션의 적용 대상이 아니다.
+
+<br><br>
+
+<h3>6.6.5 정적 컨텍스트에서는 클래스 타입 변수가 유효하지 않다.</h3>
+
+---
+
+Entry<K, V> 처럼 타입 변수를 받는 제네릭 클래스가 있다. 이때 정적 변수나 메서드에서는 K와 V의 타입 변수를 사용할 수 없다. (정적이니까 당연한 얘기)
+
+<br>
+
+```java
+public class Entry<K, V> {
+	private static V defaultValue;
+		// 오류 - 정적 컨텍스트에서 V를 사용했다.
+	public static void setDefault(V value) { defaultValue = value; }
+		// 오류 - 정적 컨텍스트에서 V를 사용했다.
+	...
+}
+```
+
+즉, 결국 타입 소거는 Entry 클래스에 이런 종류의 변수나 메서드가 K와 V별로 있지 않고 오직 한 개만 있다는 것을 의미한다.
+
+<br><br>
+
+<h3>6.6.6 메서드가 소거 후 충돌하지 않을 수도 있다.</h3>
+
+---
+
+타입 소거 후 충돌을 일으킬 수 있는 메서드는 선언하지 말아야 한다.
+
+```java
+public interface Ordered<T> extends Comparable<T> {
+	public default boolean equals(T value) {
+		// 오류 - 소거 결과 Object.equals와 충돌한다.
+		return compareTo(value) == 0;
+	}
+}
+```
+
+<br>
+
+위 코드에서 equals(T value) 메서드는 equals(Object value)로 소거되어 Object의 equals 메서드와 충돌한다.
+
+<br>
+
+상당히 성가신 경우 (충돌 원인이 미묘)
+
+```java
+public class Employee Implements Comparable<Employee> {
+	...
+	public int compareTo(Employee other) {
+		return name.compareTo(other.name);
+	}
+}
+
+public class Manager extends Employee Implements Comparable<Manager> {
+	// 오류 - 두 Comparable 인스턴스를 슈퍼타입으로 둘 수 없다.
+	...
+	public int compareTo(Manager other) {
+		return Double.compare(salary, other.salary);
+	}
+}
+
+```
+
+<br>
+
+위 코드에서 Manager 클래스는 Employee를 확장하기에 Comparable<Employee>를 슈퍼타입으로 둔다. 관리자는 당연히 이름이 아니라 급여로 서로를 비교하려고 한다. 위는 오류가 나는데 이는 여기서 소거가 발생하지 않고 메서드가 두개 생기기 때문이다.
+
+<br>
+
+```java
+public int compareTo(Employee other)
+public int compareTo(Manager other)
+```
+
+따라서, 브리지 메서드가 충돌한다. 
+
+<br><br>
+
+<h3>6.6.7 예외와 제네릭</h3>
+
+---
+
+제네릭 클래스의 객체는 예외로 던지거나 잡을 수 없다. 사실 Throwable의 제네릭 서브클래스 조차 만들 수 없다.
+
+```java
+public class Problem<T> extends Exception
+	// 오류 - 제네릭 클래스는 Throwable의 서브타입이 될 수 없다.
+```
+
+<br>
+
+catch 절에서는 타입 변수를 사용할 수 없다.
+
+```java
+public static <T extends Throwable> void doWork(Runnable r, Class<T> cl) {
+	try {
+		r.run();	
+	} catch (T ex) { // 오류 - 타입 변수는 잡을 수 없다.
+		Logger.getGlobal().log(..., ..., ex);
+	}
+}
+
+// 하지만 throws 선언에는 타입 변수를 사용할 수 있다.
+
+public static <V, T extends Throwable> V doWork(Callable<V> c, T ex) throws T {
+	try {
+		return c.call();	
+	} catch (Throwable realEx) {
+		ex.initCause(realEx);
+		throw ex;
+	}
+}
+```
