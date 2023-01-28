@@ -532,3 +532,144 @@ Object get(int) // ArrayList에 정의된 메서드를 오버라이드한다.
 제네릭 타입에만 브리지 메서드를 사용하는 것은 아니다. 공변 반환 타입(covariant return type)을 구현할 때도 브리지 메서드가 사용된다.
 
 </blockquote>
+
+<br><br>
+
+<h2>6.6 제네릭의 제약</h2>
+
+---
+
+자바에서 제네릭 타입과 메서드를 사용할 때는 몇 가지 제약이 있다. 대부분은 타입 소거 때문에 생기는 제약이다.
+
+<br><br>
+
+<h3>6.6.1 기본 타입 인수를 사용할 수 없다</h3>
+
+---
+
+타입 매개변수는 절대로 기본 타입이 될 수 없다. 즉, ArrayList<int> 는 불가능하다. 또한, 가상 머신에는 오직 Object 타입 요소를 저장하는 로(raw) 타입인 ArrayList 만 있다. 또한, int는 객체가 아니다.
+
+<br><br>
+
+<h3>6.6.2 실행 시간에는 모든 타입이 로 형태다</h3>
+
+---
+
+가상 머신에는 오직 로 타입(raw type)만 있다. 따라서 실행 시간에 ArrayList가 String 객체를 담고 있는지 알아낼 수 없다.
+
+```java
+if(a instanceof ArrayList<String>)
+// 위 조건은 절대 검사할 수 없으므로, 컴파일 시간 오류(compile-time error)를 일으킨다.
+```
+
+<br>
+
+마찬가지로 제네릭 타입의 인스턴스로 캐스트하는 것도 효력은 없지만, 문법에는 맞다.
+
+```java
+Object result = ...;
+ArrayList<String> list = (ArrayList<String>) result;
+// 경고 - result가 로 ArrayList인지만 검사한다.
+```
+
+위 캐스트를 피할 방법이 없을 때도 캐스트가 허용된다. 따라서 이럴 때 경고가 사라지게 하기 위해서는, ArrayList, ArrayList<?>로 캐스트 하는 것으로는 충분하지 않고 애너테이션을 붙여야 한다.
+
+<br>
+
+```java
+@SuppressWarnings("unchecked") ArrayList<String> list
+	= (ArrayList<String>) result;
+```
+
+<br>
+
+**Caution**
+
+<blockquote>
+
+@SuppressWarnings 애너테이션을 잘못 사용하면 힙 펄루션(heap pollution) 힙 오염으로 이루어질 수 있다. 여기서 힙 펄루션이란 객체가 특정 제네릭 타입 인스턴스에 속해야 하지만, 실제로는 다른 인스턴스에 속하는 현상을 의미한다.
+
+</blockquote>
+
+<br>
+
+**Tip**
+
+<blockquote>
+
+힙 펄루션의 문제점은 보고되는 실행 시간 오류가 문제의 원인(부적합한 요소의 삽입)과 상당히 다르다는 것이다. 이런 문제를 디버그하려면 ‘검사 뷰(checked view)’를 사용해야 한다. 예를 들어 ArrayList<String>을 생성한 위치에서 다음 코드를 대신 사용해야 한다.
+
+```java
+List<String> strings
+	= Collections.checkedList(new ArrayList<>(), String.class);
+// 위 뷰는 리스트에 삽입되는 요소를 모두 감시하며 부적합한 타입 객체가 추가되는 순간 예외를 던진다.
+```
+
+</blockquote>
+
+<br>
+
+getClass 메서드는 항상 로 타입을 반환한다. 또, 클래스 리터럴에는 타입 변수를 사용할 수 없다. 즉, T.class, T[].class, ArrayList<T>.class 는 존재하지 않는다.
+
+<br><br>
+
+<h3>6.6.3 타입 변수를 인스턴스화 할 수 없다</h3>
+
+---
+
+타입 변수는 T(…) 또는 new T[…] 같은 표현식에 사용할 수 없다. 이런 형태는 T가 소거되면 프로그래머가 의도한 대로 작동하지 않기 때문에 사용을 금한다.
+
+<br>
+
+제네릭 인스턴스나 배열을 생성하려면 더 복잡한 작업을 해야 한다. repeat 메서드를 만들어서 Arrays.repeat(n, obj)로 obj의 사본 n개를 담은 배열을 생성할 수 있게 하고 싶다 하자. 당연히 배열의 요소 타입이 obj의 타입과 같게 만드려고 할 것이다. 하지만, 이렇게 되면 제대로 작동하지 않는다.
+
+<br>
+
+```java
+public static <T> T[] repeat(int n, T obj) {
+	T[] result = new T[n]; // 오류 - new T[...]로는 배열 생성 불가
+	for (int i = 0; i < n; i++) result[i] = obj;
+	return result;
+}
+// 위 문제를 해결하기 위해서는 호출하는 쪽에서 배열 생성자를 메서드 참조로 전달하게 해야 한다.
+
+String[] greetings = Arrays.reapeat(10, "Hi", String[]:new);
+
+// 제대로 작동하는 repeat 메서드
+public static <T> T[] repeat(int n, T obj, IntFunction<T[]> constr) {
+	T[] result = constr.apply(n);
+	for (int i = 0; i < n; i++) result[i] = obj;
+	return result;
+}
+
+// 사용자에게 클래스 객체를 전달하게 하고 리플렉션을 이용하는 방법
+public static <T> T[] repeat(int n, T obj, Class<T> cl) {
+	@SuppressWarnings("unchecked") T[] result 
+		= (T[]) java.lang.reflect.Array.newInstance(cl, n);
+	for (int i = 0; i < n; i++) result[i] = obj;
+	return result;
+}
+
+// 위 메서드는 다음처럼 호출한다.
+String[] greetings = Arrays.repeat(10, "Hi", String.class);
+```
+
+<br>
+
+다른 옵션으로 호출하는 쪽에서 배열을 할당하는 방법이 있다. 메서드에서 전달받은 배열이 너무 짧다면 리플렉션으로 새 배열을 만들면 된다.
+
+```java
+public static <T> T[] repeat(int n, T obj, T[] array) {
+	T[] result;
+	if (array.length >= n)
+		result = array;
+	else {
+		@SuppressWarnings("inchecked") T[] newArray
+			= (T[]) java.lang.reflect.Array.newInstance(
+				array.getClass().getComponentType(), n);
+		result = newArray;
+	}
+	for (int i = 0; i < n; i++) result[i] = obj;
+	return result;
+}
+```
