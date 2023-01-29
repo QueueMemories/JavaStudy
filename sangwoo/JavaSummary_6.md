@@ -850,3 +850,74 @@ public static <V, T extends Throwable> V doWork(Callable<V> c, T ex) throws T {
 	}
 }
 ```
+
+<br><br>
+
+<h2>6.7 리플렉션과 제네릭</h2>
+
+---
+
+이 절에서 리플렉션 패키지에 속한 제네릭 클래스로 할 수 있는 일을 알아보, 가상 머신에서 소거 과정을 거치고 남은 소량의 제네릭 타입 정보를 찾아내는 방법을 살펴본다.
+
+<br>
+
+<h3>6.7.1 Class<T> 클래스</h3>
+
+---
+
+Class 클래스는 Class 객체가 기술하는 클래스를 타입 매개변수로 받는다.
+
+<br>
+
+String 클래스. 가상 머신에는 이 클래스에 해당하는 Class 객체가 있으며, “Fred”.getClass() 형태로 얻어 올 수 있다. String.class 리터럴로도 얻을 수 있다. 이 객체를 이용하면 String 클래스에 속한 메서드를 찾아내거나 인스턴스를 생성할 수 있다.
+
+<br>
+
+타입 매개변수는 타입에 안전한 코드를 작성하는데 도움이 된다. 
+
+<br>
+
+예를 들어 Class<T>의 getConstructor 메서드는 Constructor<T> 를 반환하도록 선언되어 있다. 또, Constructor<T>의 newInstance 메서드는 T 타입 객체를 반환하도록 선언되어 있다. String.class의 타입이 Class<String>인 것도 이 때문이다. 즉, Class<String>의 getConstructor 메서드는 Constructor<String>을 반환하고, Constructor<String>의 newInstance 메서드는 String을 반환한다. 이를 이용하여 캐스트를 하지 않아도 된다.
+
+<br>
+
+```java
+public static <T> ArrayList<T> repeat(int n, Class<T> cl) 
+				throws ReflecticeOperationException {
+	ArrayList<T> result = new ArrayList<>();
+	for (int i = 0; i < n; i++) {
+		result.add(cl.getConstructor().newInstance());
+	}
+	return result;
+}
+```
+
+<br>
+
+cl.getConstructor().newInstance()가 T 타입 결과를 반환하므로 이 메서드는 제대로 컴파일 된다. 위 메서드를 repeat(10, Employee.class)처럼 호출한다면, Employee.class 의 타입이 Class<Employee>이므로 T가 Employee 타입으로 추론된다. 따라서 반환 타입은 ArrayList<Employee>이다.
+
+<br><br>
+
+<h3>6.7.2 가상 머신에 있는 제네릭 타입 정보</h3>
+
+---
+
+소거는 오직 인스턴스화된 타입 매개변수에만 영향을 준다. 따라서 제네릭 클래스와 메서드의 선언(declaration)과 관련된 완전한 정보를 실행 시간에 얻을 수 있다.
+
+<br>
+
+java.lang.reflect 패키지에 들어 있는 Type 인터페이스는 제네릭 타입 선언을 나타낸다. Type 인터페이스의 서브타입은 다음과 같다.
+
+1. 구체적인 타입을 기술하는 Class 클래스
+2. (T extends Comparable<? super T> 같은) 타입 변수를 나타내는 TypeVariable 인터페이스
+3. (? super T 같은) 와인드카드를 나타내는 WildcardType 인터페이스
+4. (Comparable<? super T> 같은) 제네릭 클래스나 인터페이스를 나타내는 ParameterizedType 인터페이스
+5. (T[] 같은) 제네릭 배열을 나타내는 GenericArrayType 인터페이스
+
+<br>
+
+서브타입 2~5는 인터페이스라는 사실을 주목해야 한다(가상 머신이 이런 인터페이스를 구현하는 적합한 클래스의 인스턴스를 생성한다).
+
+<br>
+
+결국 핵심은 제네렉 클래스와 제네릭 메서드의 헤더는 지워지지 않으므로 리플렉션으로 접근할 수 있다.
