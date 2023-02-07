@@ -318,7 +318,129 @@ scores[0] = new int[2]; // [0][1]
 scores[1] = new int[3]; // [0][1][2]
 ```
 
+<br>
+
 ```java
 // 아래처럼 생성 가능.
 int[][] scores = { {95, 80}, {92, 96} };
 ```
+
+<br>
+
+### 객체를 참조하는 배열
+
+---
+
+기본 타입 배열은 각 항목에 직접 값을 가지고 있지만, 참조 타입 배열은 각 항목에 객체의 번지를 가지고 있다.
+
+<br>
+
+```java
+String[] strArray = new String[2];
+strArray[0] = "moon"
+strArray[1] = "sangwool"
+```
+
+위 strArray는 String 타입 배열 객체를 참조하고, strArray의 각 인덱스는 moon, sangwool의 String 객체를 참조한다. 따라서 String[] 배열 항목 간에 문자열을 비교하기 위해서는 ==이 아닌 .equals()를 사용해야 한다. 
+
+<br>
+
+한참 위에서 얘기했던 new 연산자를 사용하지 않고 String 객체를 생성할 경우, 같은 리터럴 값을 대입 받게 되면 String은 같은 객체을 참조한다고 했는데 이 경우에도 동일하다.
+
+<br>
+
+### 배열 복사
+
+---
+
+처음에 선언한 크기보다 더 큰 배열을 사용하고 싶다면, 먼저 더 큰 배열을 생성하고 이전 배열로부터 항목 값들을 복사해야 한다. for문 또는 System.arraycopy() 메소드를 통해 복사할 수 있다.
+
+<br>
+
+```java
+System.arraycopy(Object src, int srcPos, Object dest, int destPos, int length);
+```
+
+- src - 원본 배열
+- srcPos - 원본 배열에서 복사할 항목의 시작 인덱스
+- dest - 새 배열
+- destPos - 새 배열에서 붙여넣을 시작 인덱스
+- length - 복사할 개수
+
+<br>
+
+```java
+System.arraycopy(arr1, 0, arr2, 0, arr1.length);
+// arr1 배열 전부를 arr2에 복사.
+```
+
+<br>
+
+참조 타입 배열이 복사되면 복사되는 값이 객체의 번지이므로 새 배열의 항목은 이전 배열의 항목이 참조하는 객체와 동일하다.
+
+<br>
+
+### 향상된 for 문
+
+---
+
+루프 카운터 변수와 증감식을 사용하지 않고, 어떤 객체의 내부를 한번씩 순환하는 것을 말한다.
+
+<br>
+
+```java
+for ( 타입 변수 : 배열 ) {
+	실행문;
+}
+```
+
+배열에 가져올 항목이 존재할 경우 → 변수로 이동 → 해당 변수를 가지고 실행문으로 이동.
+
+<br>
+
+## 열거 타입
+
+---
+
+한정된 값만을 갖는 타입을 열거 타입(enumeration type)라고 한다. 즉, 한정된 값인 열거 상수(enumeration constant) 중에서 하나의 상수를 저장하는 타입이다.
+
+<br>
+
+```java
+public enum Week {
+	MONDAY,
+	TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY,
+    SUNDAY
+}
+```
+
+위에서 Week를 열거 타입이라고 한다. 위 Week 내부에 존재하는 열거 상수를 사용할 수 있다. 열거 상수는 모두 대문자로 작성하는게 관례이다.
+
+<br>
+
+```java
+Week today = Week.MONDAY;
+```
+
+열거 타입으로 된 곳에 열거 상수를 넣어 사용할 수 있고, 열거 타입 내부에 정의된 열거 상수를 제외한 다른 값은 넣을 수 없다. 또한, 열거 상수는 단독으로 사용할 수 없고, 반드시 ‘열거 타입.열거 상수’ 로 사용한다.
+
+<br>
+
+열거 타입 변수도 참조 타입이기에, null 값을 넣어 초기화 시킬 수 있다. 열거 타입은 클래스이기에, 메소드 영역에 생성되고, 실제 값은 힙영역에 있는 열거 타입 객체를 참조한다.
+
+<br>
+
+위 코드로 이해하자면, 
+
+1. 힙영역에 실제 MONDAY 값이 객체로 생성
+2. Week타입 MONDAY는 메소드 영역에 생성되고 힙영역에 존재하는 MONDAY를 참조
+3. 위 메소드 영역에서 참조하고 있는 번지수를 스택 영역에 있는 today 변수가 복사하여 참조
+
+<br>
+
+> 즉, today == Week.MONDAY가 된다. Week today1 = Week.MONDAY; 실행문을 실행했을 때, today == today1 의 값은 true가 된다.
+>
